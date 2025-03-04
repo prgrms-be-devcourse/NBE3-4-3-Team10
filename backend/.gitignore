@@ -42,3 +42,4 @@ db_dev.trace.db
 **/application-secret.yml
 **/api-docs.json
 package-lock.json
+**/ScheduleMapperImpl
