@@ -1,7 +1,10 @@
 plugins {
 	java
-	id("org.springframework.boot") version "3.4.1"
+	id("org.springframework.boot") version "3.4.2"
 	id("io.spring.dependency-management") version "1.1.7"
+	kotlin("jvm") version "1.9.25"
+	kotlin("plugin.spring") version "1.9.25"
+	kotlin("plugin.jpa") version "1.9.25"
 }
 
 group = "com.ll"
@@ -43,6 +46,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
 	implementation("org.json:json:20250107")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1")
 
@@ -50,11 +54,27 @@ dependencies {
 
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
-	implementation ("org.mapstruct:mapstruct:1.6.3")
+	implementation("org.mapstruct:mapstruct:1.6.3")
+	annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
 
-	annotationProcessor ("org.mapstruct:mapstruct-processor:1.6.3")
+	implementation(kotlin("stdlib-jdk8"))
+	implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+kotlin {
+	compilerOptions {
+		freeCompilerArgs.addAll("-Xjsr305=strict")
+	}
+}
+
+allOpen {
+	annotation("jakarta.persistence.Entity")
+	annotation("jakarta.persistence.MappedSuperclass")
+	annotation("jakarta.persistence.Embeddable")
 }
