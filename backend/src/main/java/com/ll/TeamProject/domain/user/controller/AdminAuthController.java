@@ -37,12 +37,12 @@ public class AdminAuthController {
     @Operation(summary = "관리자 로그인")
     public ResponseEntity<ResponseDto<LoginDto>> login(@RequestBody @Valid UserLoginReqBody req) {
 
-        LoginDto loginDto = authService.login(req.username(), req.password());
+        LoginDto loginDto = authService.login(req.getUsername(), req.getPassword());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseDto.success(
-                        "%s님 환영합니다.".formatted(loginDto.item().nickname()),
+                        "%s님 환영합니다.".formatted(loginDto.getItem().nickname()),
                         loginDto
                 )
         );
@@ -68,7 +68,7 @@ public class AdminAuthController {
     @Operation(summary = "인증번호 발송")
     public ResponseEntity<Void> sendVerification(@RequestBody @Valid VerificationCodeRequest req) {
 
-        accountVerificationService.processVerification(req.username(), req.email());
+        accountVerificationService.processVerification(req.getUsername(), req.getEmail());
 
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
@@ -78,7 +78,7 @@ public class AdminAuthController {
     @PostMapping("/verification-codes/verify")
     @Operation(summary = "관리자 계정 잠김 이메일 인증")
     public ResponseEntity<Void> verificationAdminAccount(@RequestBody @Valid VerificationCodeVerifyRequest req) {
-        accountVerificationService.verifyAndUnlockAccount(req.username(), req.verificationCode());
+        accountVerificationService.verifyAndUnlockAccount(req.getUsername(), req.getVerificationCode());
 
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

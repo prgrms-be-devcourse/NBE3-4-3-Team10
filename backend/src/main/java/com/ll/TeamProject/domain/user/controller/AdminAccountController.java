@@ -26,7 +26,7 @@ public class AdminAccountController {
             @PathVariable("username") String username,
             @RequestBody @Valid PasswordChangeRequest request) {
 
-        accountVerificationService.changePassword(username, request.password());
+        accountVerificationService.changePassword(username, request.getPassword());
 
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

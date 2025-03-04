@@ -45,7 +45,7 @@ public class UserController {
     @PostMapping
     @Operation(summary = "내정보 수정")
     public ResponseEntity<ResponseDto<Void>> modifyUser(@RequestBody @Valid ModifyUserReqBody reqbody) {
-        userService.modify(reqbody.nickname());
+        userService.modify(reqbody.getNickname());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
