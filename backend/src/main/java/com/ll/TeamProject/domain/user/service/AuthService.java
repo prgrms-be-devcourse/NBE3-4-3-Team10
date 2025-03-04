@@ -21,7 +21,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public LoginDto login(String username, String password) {
-
         SiteUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(UserErrorCode.INVALID_CREDENTIALS));
 

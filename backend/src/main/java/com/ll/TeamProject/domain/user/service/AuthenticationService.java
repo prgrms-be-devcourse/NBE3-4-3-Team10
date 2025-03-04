@@ -21,7 +21,7 @@ public class AuthenticationService {
     public void modifyLastLogin(SiteUser user) {
         authenticationRepository.findByUserId(user.getId())
                 .ifPresent(authentication -> {
-                    authentication.setLastLogin();
+                    authentication.updateLastLogin();
                     authentication.resetFailedAttempts();
                     authenticationRepository.save(authentication);
                 });
@@ -31,7 +31,7 @@ public class AuthenticationService {
     public void handleLoginFailure(SiteUser user) {
         authenticationRepository.findByUserId(user.getId()).ifPresent(authentication -> {
 
-            int failedLogin = authentication.failedLogin();
+            int failedLogin = authentication.incrementFailedAttempts();
 
             if (failedLogin >= 5) {
                 user.lockAccount();

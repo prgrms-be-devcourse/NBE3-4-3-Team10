@@ -42,7 +42,7 @@ public class AdminAuthController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseDto.success(
-                        "%s님 환영합니다.".formatted(loginDto.getItem().nickname()),
+                        "%s님 환영합니다.".formatted(loginDto.getItem().getNickname()),
                         loginDto
                 )
         );

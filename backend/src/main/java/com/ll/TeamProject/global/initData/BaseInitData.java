@@ -5,6 +5,7 @@ import com.ll.TeamProject.domain.calendar.repository.CalendarRepository;
 import com.ll.TeamProject.domain.user.entity.Authentication;
 import com.ll.TeamProject.domain.user.entity.ForbiddenNickname;
 import com.ll.TeamProject.domain.user.entity.SiteUser;
+import com.ll.TeamProject.domain.user.enums.AuthType;
 import com.ll.TeamProject.domain.user.repository.AuthenticationRepository;
 import com.ll.TeamProject.domain.user.repository.ForbiddenRepository;
 import com.ll.TeamProject.domain.user.repository.UserRepository;
@@ -55,46 +56,44 @@ public class BaseInitData {
         // 관리자 계정 만들기
         if (userRepository.count() == 0) {
             for(int i = 1 ; i <= 2 ; i++) {
-                SiteUser admin = SiteUser
-                        .builder()
-                        .username("admin" + i)
-                        .nickname("관리자" + i)
-                        .password(passwordEncoder.encode("admin" + i))
-                        .role(ADMIN)
-                        .email("test"  + i + "@test.com")
-                        .apiKey(UUID.randomUUID().toString())
-                        .locked(false)
-                        .build();
+                SiteUser admin = new SiteUser(
+                        "admin" + i,
+                        passwordEncoder.encode("admin" + i),
+                        "관리자" + i,
+                        "admin" + i + "@test.com",
+                        ADMIN,
+                        UUID.randomUUID().toString()
+                );
                 admin = userRepository.save(admin);
 
-                Authentication authentication = Authentication
-                        .builder()
-                        .user(admin)
-                        .authType(LOCAL)
-                        .failedAttempts(0)
-                        .build();
+                Authentication authentication = Authentication.create(
+                        admin,
+                        LOCAL,
+                        null,
+                        0
+                );
 
                 authenticationRepository.save(authentication);
             }
 
             for (int i = 1; i <= 13; i++) {
-                SiteUser user = SiteUser.builder()
-                        .username("user" + i)
-                        .nickname("테스트 회원" + i)
-                        .password(passwordEncoder.encode("1234"))
-                        .role(USER)
-                        .email("user" + i + "@test.com")
-                        .apiKey(UUID.randomUUID().toString())
-                        .locked(false)
-                        .build();
+                SiteUser user = new SiteUser(
+                        "user" + i,
+                        passwordEncoder.encode("admin" + i),
+                        "회원" + i,
+                        "user" + i + "@test.com",
+                        USER,
+                        UUID.randomUUID().toString()
+                );
+
                 user = userRepository.save(user);
 
-                Authentication userAuthentication = Authentication
-                        .builder()
-                        .user(user)
-                        .authType(LOCAL)
-                        .failedAttempts(0)
-                        .build();
+                Authentication userAuthentication = Authentication.create(
+                        user,
+                        AuthType.LOCAL,
+                        null,
+                        0
+                );
 
                 authenticationRepository.save(userAuthentication);
             }
@@ -158,23 +157,23 @@ public class BaseInitData {
                 String username = "login_" + monthsAgo + "_months_ago";
                 String nickname = monthsAgo + "개월전";
 
-                SiteUser siteUser = SiteUser.builder()
-                        .username(username)
-                        .nickname(nickname)
-                        .password(passwordEncoder.encode("1234"))
-                        .role(USER)
-                        .email(username + "@test.com")
-                        .apiKey(UUID.randomUUID().toString())
-                        .locked(false)
-                        .build();
-                userRepository.save(siteUser);
+                SiteUser user = new SiteUser(
+                        username,
+                        passwordEncoder.encode("1234"),
+                        nickname,
+                        username + "@test.com",
+                        USER,
+                        UUID.randomUUID().toString()
+                );
 
-                Authentication authentication = Authentication.builder()
-                        .user(siteUser)
-                        .authType(LOCAL)
-                        .lastLogin(LocalDateTime.now().minusMonths(monthsAgo))
-                        .failedAttempts(0)
-                        .build();
+                userRepository.save(user);
+
+                Authentication authentication = Authentication.create(
+                        user,
+                        AuthType.LOCAL,
+                        LocalDateTime.now().minusMonths(monthsAgo),
+                        0
+                );
                 authenticationRepository.save(authentication);
             }
         }
@@ -184,24 +183,25 @@ public class BaseInitData {
     public void makeDeletedUsers() {
         if (userRepository.count() < 20) {
             for (int i = 1; i <= 3; i++) {
-                SiteUser siteUser = SiteUser.builder()
-                        .username("deleted_" + UUID.randomUUID())
-                        .nickname("탈퇴한 사용자"+ i)
-                        .password(passwordEncoder.encode("1234"))
-                        .role(USER)
-                        .email("deleted_" + i + "@test.com")
-                        .apiKey(UUID.randomUUID().toString())
-                        .isDeleted(true)
-                        .deletedDate(LocalDateTime.now())
-                        .build();
-                userRepository.save(siteUser);
 
-                Authentication authentication = Authentication.builder()
-                        .user(siteUser)
-                        .authType(LOCAL)
-                        .lastLogin(LocalDateTime.now().minusMonths(12))
-                        .failedAttempts(0)
-                        .build();
+                SiteUser user = new SiteUser(
+                        "deleted_" + UUID.randomUUID().toString(),
+                        passwordEncoder.encode("1234"),
+                        "탈퇴회원" + i,
+                        "deleted_" + i + "@test.com",
+                        USER,
+                        UUID.randomUUID().toString(),
+                        true,
+                        LocalDateTime.now()
+                );
+                userRepository.save(user);
+
+                Authentication authentication = Authentication.create(
+                        user,
+                        AuthType.LOCAL,
+                        LocalDateTime.now().minusMonths(12),
+                        0
+                );
                 authenticationRepository.save(authentication);
             }
         }

@@ -7,4 +7,3 @@ data class VerificationCodeRequest(
     @field:NotBlank val username: String,
     @field:Email val email: String
 )
-
