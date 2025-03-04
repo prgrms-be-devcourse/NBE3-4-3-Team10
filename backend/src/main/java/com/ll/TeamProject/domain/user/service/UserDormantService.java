@@ -44,12 +44,12 @@ public class UserDormantService {
                 ids -> userRepository.bulkDeleteAccounts(ids, LocalDateTime.now()));
     }
 
-    private List<DormantAccountProjection> findCandidatesByMonthsAgo(int monthsAgo) {
+    public List<DormantAccountProjection> findCandidatesByMonthsAgo(int monthsAgo) {
         LocalDateTime[] dateRange = calculateDateRange(monthsAgo);
         return authenticationRepository.findDormantAccountsInDateRange(dateRange[0], dateRange[1]);
     }
 
-    private List<Long> findUserIdsByMonthsAgo(int monthsAgo) {
+    public List<Long> findUserIdsByMonthsAgo(int monthsAgo) {
         LocalDateTime[] dateRange = calculateDateRange(monthsAgo);
         return userRepository.findUserIdsInDateRange(dateRange[0], dateRange[1]);
     }
@@ -73,7 +73,7 @@ public class UserDormantService {
         });
     }
 
-    private <T> void processInBatches(List<T> ids, int batchSize, Consumer<List<T>> processor) {
+    public <T> void processInBatches(List<T> ids, int batchSize, Consumer<List<T>> processor) {
         for (int i = 0; i < ids.size(); i += batchSize) {
             int end = Math.min(i + batchSize, ids.size());
             List<T> batch = ids.subList(i, end);
