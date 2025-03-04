@@ -2,7 +2,6 @@ package com.ll.TeamProject.domain.calendar.service;
 
 import com.ll.TeamProject.domain.calendar.dto.CalendarCreateDto;
 import com.ll.TeamProject.domain.calendar.dto.CalendarUpdateDto;
-import com.ll.TeamProject.domain.calendar.entity.Calendar;
 import com.ll.TeamProject.domain.calendar.repository.CalendarRepository;
 import com.ll.TeamProject.domain.user.entity.SiteUser;
 import com.ll.TeamProject.global.exceptions.ServiceException;

@@ -1,6 +1,5 @@
 package com.ll.TeamProject.domain.schedule.entity;
 
-import com.ll.TeamProject.domain.calendar.entity.Calendar;
 import com.ll.TeamProject.domain.user.entity.SiteUser;
 import com.ll.TeamProject.global.jpa.entity.BaseTime;
 import com.ll.TeamProject.global.jpa.entity.Location;

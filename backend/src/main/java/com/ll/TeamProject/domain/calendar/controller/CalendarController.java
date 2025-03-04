@@ -2,7 +2,6 @@ package com.ll.TeamProject.domain.calendar.controller;
 
 import com.ll.TeamProject.domain.calendar.dto.CalendarCreateDto;
 import com.ll.TeamProject.domain.calendar.dto.CalendarUpdateDto;
-import com.ll.TeamProject.domain.calendar.entity.Calendar;
 import com.ll.TeamProject.domain.calendar.service.CalendarService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,5 @@
 package com.ll.TeamProject.domain.schedule.service;
 
-import com.ll.TeamProject.domain.calendar.entity.Calendar;
 import com.ll.TeamProject.domain.calendar.repository.CalendarRepository;
 import com.ll.TeamProject.domain.schedule.dto.ScheduleRequestDto;
 import com.ll.TeamProject.domain.schedule.dto.ScheduleResponseDto;

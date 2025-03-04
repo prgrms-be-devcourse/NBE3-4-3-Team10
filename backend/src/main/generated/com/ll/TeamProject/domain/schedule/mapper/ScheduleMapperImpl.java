@@ -1,6 +1,5 @@
 package com.ll.TeamProject.domain.schedule.mapper;
 
-import com.ll.TeamProject.domain.calendar.entity.Calendar;
 import com.ll.TeamProject.domain.schedule.dto.ScheduleResponseDto;
 import com.ll.TeamProject.domain.schedule.entity.Schedule;
 import com.ll.TeamProject.global.jpa.entity.Location;
