@@ -1,0 +1,74 @@
+.right-sidebar {
+    height: 100%;
+    background-color: #ffffff;
+    border-left: 1px solid #e1e3e6;
+    padding: 16px;
+}
+
+.sidebar-header {
+    padding: 8px 0 20px 0;
+    text-align: center;
+}
+
+.sidebar-title {
+    font-size: 16px;
+    font-weight: 300;
+    color: #3c4043;
+    letter-spacing: 0.5px;
+}
+
+.section {
+    margin-bottom: 16px;
+    background-color: #ffffff;
+    border: 1px solid #e1e3e6;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.section-header {
+    font-size: 12px;
+    font-weight: 300;
+    color: #5f6368;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.section-content {
+    min-height: 180px;
+}
+
+.friends-list, .chat-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.friend-item, .chat-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.friend-item:hover, .chat-item:hover {
+    background-color: #f1f3f4;
+}
+
+.item-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e8eaed;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-name {
+    font-size: 14px;
+    color: #3c4043;
+}

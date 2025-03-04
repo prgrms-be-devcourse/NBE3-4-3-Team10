@@ -1,0 +1,3 @@
+DELETE FROM schedule;
+
+ALTER TABLE schedule ALTER COLUMN id RESTART WITH 1;

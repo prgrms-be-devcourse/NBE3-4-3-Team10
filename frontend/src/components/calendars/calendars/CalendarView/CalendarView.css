@@ -1,0 +1,168 @@
+.calendar-view {
+    height: 100%;
+    background-color: #ffffff;
+    padding: 16px;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.calendar-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-button {
+    padding: 8px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #5f6368;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.nav-button:hover {
+    background-color: #f1f3f4;
+}
+
+.today-button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: 1px solid #dadce0;
+    background-color: #ffffff;
+    color: #3c4043;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.today-button:hover {
+    background-color: #f1f3f4;
+}
+
+.calendar-title {
+    font-size: 22px;
+    font-weight: 400;
+    color: #3c4043;
+}
+
+.calendar-grid {
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.fc-header-toolbar {
+    padding: 12px 16px !important;
+    margin-bottom: 0 !important;
+}
+
+.fc-button {
+    background-color: #ffffff !important;
+    border-color: #dadce0 !important;
+    color: #3c4043 !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    padding: 6px 12px !important;
+}
+
+.fc-button:hover {
+    background-color: #f1f3f4 !important;
+}
+
+.fc-button-active {
+    background-color: #e8f0fe !important;
+    color: #1a73e8 !important;
+}
+
+.fc-day-today {
+    background-color: #f8f9fa !important;
+}
+
+.fc-event {
+    border: none !important;
+    padding: 2px 4px !important;
+    margin: 1px 0 !important;
+    background-color: #71a7ec !important;
+}
+
+.fc th {
+    padding: 8px 0 !important;
+    font-weight: 500 !important;
+}
+
+.fc td {
+    border-color: #dadce0 !important;
+}
+
+.empty-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #5f6368;
+    text-align: center;
+    padding: 32px;
+    position: relative;
+}
+
+.create-schedule-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 12px 24px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+}
+
+.create-schedule-button:hover {
+    background-color: #1557b0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.empty-state-title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.empty-state-description {
+    font-size: 14px;
+    color: #80868b;
+}
+
+.add-schedule-button {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    padding: 12px 24px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+}
+
+.add-schedule-button:hover {
+    background-color: #1557b0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

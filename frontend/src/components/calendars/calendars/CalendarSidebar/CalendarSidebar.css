@@ -1,0 +1,89 @@
+.calendar-sidebar {
+    padding: 8px;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.79);
+    border-right: 1px solid #e1e3e6;
+}
+
+.create-button {
+    width: 100%;
+    padding: 12px 24px;
+    margin: 8px 0 20px 0;
+    background-color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    color: #3c4043;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.create-button:hover {
+    background-color: #f6fafe;
+    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.302);
+}
+
+.calendar-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+}
+
+.calendar-list-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #3c4043;
+}
+
+.calendar-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 0 16px 16px 0;
+    margin: 2px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-item:hover {
+    background-color: #f1f3f4;
+}
+
+.calendar-item.selected {
+    background-color: #e8f0fe;
+}
+
+.calendar-item-name {
+    margin-left: 12px;
+    font-size: 14px;
+    color: #3c4043;
+    flex: 1;
+}
+
+.calendar-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.calendar-item:hover .calendar-actions {
+    opacity: 1;
+}
+
+.action-button {
+    padding: 4px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #5f6368;
+}
+
+.action-button:hover {
+    background-color: rgba(95, 99, 104, 0.1);
+}

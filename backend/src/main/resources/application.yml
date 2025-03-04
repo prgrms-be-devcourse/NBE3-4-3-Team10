@@ -1,0 +1,89 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: dev
+    include: secret
+    spring:
+      h2:
+        console:
+          enabled: true
+          path: /h2-console
+
+  datasource:
+    url: jdbc:h2:./db_dev;MODE=MySQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            clientId: ON_SECRET
+            scope: profile_nickname, profile_image, account_email
+            client-name: Kakao
+            authorization-grant-type: authorization_code
+            redirect-uri: "${custom.dev.backUrl}/{action}/oauth2/code/{registrationId}"
+          google:
+            clientId: ON_SECRET
+            clientSecret: ON_SECRET
+            scope: email, profile
+            client-name: Google
+            authorization-grant-type: authorization_code
+            redirect-uri: "${custom.dev.backUrl}/{action}/oauth2/code/{registrationId}"
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
+            user-name-attribute: id
+
+  output:
+    ansi:
+      enabled: always #색깔
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+        highlight-sql: true
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
+springdoc:
+  default-produces-media-type: application/json;charset=UTF-8
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.orm.jdbc.extract: TRACE
+    org.springframework.security: DEBUG
+
+custom:
+  dev:
+    cookieDomain: localhost
+    frontUrl: "http://${custom.dev.cookieDomain}:3000"
+    backUrl: "http://${custom.dev.cookieDomain}:${server.port}"
+
+  jwt:
+    secretKey: ON_SECRET
+  accessToken:
+    expirationSeconds: "#{60 * 20}"

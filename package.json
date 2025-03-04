@@ -1,0 +1,19 @@
+{
+  "name": "nbe3-4-2-team10",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prgrms-be-devcourse/NBE3-4-2-Team10.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prgrms-be-devcourse/NBE3-4-2-Team10/issues"
+  },
+  "homepage": "https://github.com/prgrms-be-devcourse/NBE3-4-2-Team10#readme",
+  "description": ""
+}

@@ -1,0 +1,41 @@
+.calendar-layout {
+    display: flex;
+    height: 100vh;
+    background-color: #ffffff;
+}
+
+.resize-handle {
+    width: 2px;
+    background-color: #f1f3f4;
+    cursor: col-resize;
+    transition: background-color 0.2s;
+}
+
+.resize-handle:hover {
+    width: 4px;
+    background-color: rgba(31, 32, 35, 0.11);
+}
+
+.panel-container {
+    display: flex;
+    flex: 1;
+}
+
+.panel {
+    height: 100%;
+    overflow: hidden;
+}
+
+.left-panel {
+    min-width: 256px;
+    max-width: 400px;
+}
+
+.main-panel {
+    flex: 1;
+}
+
+.right-panel {
+    min-width: 256px;
+    max-width: 400px;
+}

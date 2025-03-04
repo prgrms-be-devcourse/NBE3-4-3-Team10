@@ -1,0 +1,27 @@
+/* app/globals.css */
+.fc {
+  background: white !important;
+}
+
+.fc-header-toolbar {
+  background-color: #ffffff !important;
+}
+
+.fc-day-today {
+  background-color: #e8f0fe !important;
+}
+
+.fc-button-primary {
+  background-color: #f8f9fa !important;
+  border-color: #dadce0 !important;
+  color: #3c4043 !important;
+}
+
+.fc-button-primary:hover {
+  background-color: #f1f3f4 !important;
+}
+
+.fc td,
+.fc th {
+  border-color: #dadce0 !important;
+}
