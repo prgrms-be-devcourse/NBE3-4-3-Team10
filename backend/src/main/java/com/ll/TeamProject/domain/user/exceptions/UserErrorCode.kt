@@ -1,14 +1,13 @@
-package com.ll.TeamProject.domain.user.exceptions;
+package com.ll.TeamProject.domain.user.exceptions
 
-import com.ll.TeamProject.global.exceptions.ErrorCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.ll.TeamProject.global.exceptions.ErrorCode
 import org.springframework.http.HttpStatus;
 
-@Getter
-@RequiredArgsConstructor
-public enum UserErrorCode implements ErrorCode {
-
+enum class UserErrorCode(
+        override val status: HttpStatus,
+        override val code: String,
+        override val message: String
+) : ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "USER_001", "아이디 또는 비밀번호가 일치하지 않습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_002", "존재하지 않는 사용자입니다."),
     FORBIDDEN_NICKNAME(HttpStatus.BAD_REQUEST, "USER_003", "해당 닉네임은 사용할 수 없습니다."),
@@ -25,9 +24,4 @@ public enum UserErrorCode implements ErrorCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH_005", "사용자 인증정보가 올바르지 않습니다."),
 
     EMAIL_SEND_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_001", "이메일 전송에 실패했습니다.");
-
-    private final HttpStatus status;
-    private final String code;
-    private final String message;
 }
-

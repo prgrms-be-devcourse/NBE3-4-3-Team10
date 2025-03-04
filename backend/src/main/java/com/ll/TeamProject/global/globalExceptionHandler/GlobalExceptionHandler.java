@@ -1,7 +1,7 @@
 package com.ll.TeamProject.global.globalExceptionHandler;
 
-import com.ll.TeamProject.domain.user.exceptions.UserErrorCode;
 import com.ll.TeamProject.global.exceptions.CustomException;
+import com.ll.TeamProject.global.exceptions.ErrorCode;
 import com.ll.TeamProject.global.exceptions.ServiceException;
 import com.ll.TeamProject.global.rsData.RsData;
 import com.ll.TeamProject.standard.base.Empty;
@@ -98,7 +98,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
-        UserErrorCode errorCode = ex.getErrorCode();
+        ErrorCode errorCode = ex.getErrorCode();
 
         log.error("CustomException 발생 - 코드: {} 메시지: {}", errorCode.getCode(), errorCode.getMessage());
 
