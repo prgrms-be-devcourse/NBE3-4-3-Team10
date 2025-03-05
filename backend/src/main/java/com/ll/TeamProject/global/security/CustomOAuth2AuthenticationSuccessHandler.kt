@@ -1,5 +1,7 @@
 package com.ll.TeamProject.global.security
 
+import com.ll.TeamProject.domain.user.exceptions.UserErrorCode
+import com.ll.TeamProject.global.exceptions.CustomException
 import com.ll.TeamProject.global.userContext.UserContext
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -21,10 +23,8 @@ class CustomOAuth2AuthenticationSuccessHandler(
         response: HttpServletResponse,
         authentication: Authentication
     ) {
-        val user = userContext.findActor().orElseThrow()
-
+        val user = userContext.findActor() ?: throw CustomException(UserErrorCode.UNAUTHORIZED)
         userContext.makeAuthCookies(user)
-
         response.sendRedirect("$devFrontUrl/calendars/")
     }
 }

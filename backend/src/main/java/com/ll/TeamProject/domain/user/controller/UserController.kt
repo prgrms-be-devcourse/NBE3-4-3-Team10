@@ -2,7 +2,9 @@ package com.ll.TeamProject.domain.user.controller
 
 import com.ll.TeamProject.domain.user.dto.ModifyUserReqBody
 import com.ll.TeamProject.domain.user.dto.UserDto
+import com.ll.TeamProject.domain.user.exceptions.UserErrorCode
 import com.ll.TeamProject.domain.user.service.UserService
+import com.ll.TeamProject.global.exceptions.CustomException
 import com.ll.TeamProject.global.rsData.ResponseDto
 import com.ll.TeamProject.global.userContext.UserContext
 import io.swagger.v3.oas.annotations.Operation
@@ -24,9 +26,10 @@ class UserController(
     @GetMapping("/me")
     @Operation(summary = "내 정보")
     fun me(): ResponseEntity<UserDto> {
-        val actor = userContext.findActor().get()
+        val actor = userContext.findActor() ?: throw CustomException(UserErrorCode.UNAUTHORIZED)
         return ResponseEntity.ok(UserDto(actor))
     }
+
 
     @DeleteMapping("/{id}")
     @Operation(summary = "회원 탈퇴 (soft)")

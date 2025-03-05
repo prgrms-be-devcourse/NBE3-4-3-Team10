@@ -63,7 +63,7 @@ class UserService(
             throw CustomException(UserErrorCode.FORBIDDEN_NICKNAME)
         }
 
-        val actor = userContext.findActor().get()
+        val actor = userContext.findActor()!! // ⚠️ actor가 `null`이면 런타임 오류 발생 (위험)
 
         try {
             actor.changeNickname(nickname)
@@ -98,7 +98,7 @@ class UserService(
     }
 
     fun validatePermission(userToDelete: SiteUser) {
-        val actor = userContext.actor
+        val actor = userContext.getActor() ?: throw CustomException(UserErrorCode.UNAUTHORIZED)
         if (actor.username == "admin") return
 
         if (userToDelete.username != actor.username) {
