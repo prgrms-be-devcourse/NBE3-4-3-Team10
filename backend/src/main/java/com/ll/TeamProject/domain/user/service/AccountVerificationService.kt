@@ -52,26 +52,26 @@ class AccountVerificationService(
     fun verifyAndUnlockAccount(username: String, verificationCode: String) {
         val redisKey = getKey(VERIFICATION_CODE_KEY, username)
 
-        redisService.getValue(redisKey)
-            .ifPresentOrElse({ storedCode: String ->
-                if (verificationCode != storedCode) {
-                    throw CustomException(UserErrorCode.VERIFICATION_CODE_MISMATCH)
-                }
-                redisService.deleteValue(redisKey)
-                redisService.setValue(
-                    getKey(PASSWORD_RESET_KEY, username),
-                    username,
-                    PASSWORD_RESET_EXPIRATION.toLong()
-                )
-            }, {
-                throw CustomException(UserErrorCode.VERIFICATION_CODE_EXPIRED)
-            })
+        redisService.getValue(redisKey)?.let { storedCode ->
+            if (verificationCode != storedCode) {
+                throw CustomException(UserErrorCode.VERIFICATION_CODE_MISMATCH)
+            }
+            redisService.deleteValue(redisKey)
+            redisService.setValue(
+                getKey(PASSWORD_RESET_KEY, username),
+                username,
+                PASSWORD_RESET_EXPIRATION.toLong()
+            )
+        } ?: run {
+            throw CustomException(UserErrorCode.VERIFICATION_CODE_EXPIRED)
+        }
     }
 
     fun changePassword(username: String, password: String) {
         val redisKey = getKey(PASSWORD_RESET_KEY, username)
+
         val storedUsername = redisService.getValue(redisKey)
-            .orElseThrow { CustomException(UserErrorCode.VERIFICATION_CODE_EXPIRED) }
+            ?: throw CustomException(UserErrorCode.VERIFICATION_CODE_EXPIRED)
 
         if (username != storedUsername) {
             redisService.deleteValue(redisKey)
@@ -94,6 +94,4 @@ class AccountVerificationService(
     private fun getKey(prefix: String, username: String): String {
         return prefix + username
     }
-
-
 }
