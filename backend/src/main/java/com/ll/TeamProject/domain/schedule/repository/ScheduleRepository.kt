@@ -1,24 +1,22 @@
-package com.ll.TeamProject.domain.schedule.repository;
+package com.ll.TeamProject.domain.schedule.repository
 
-import com.ll.TeamProject.domain.schedule.entity.Schedule;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.query.Param;
+import com.ll.TeamProject.domain.schedule.entity.Schedule
+import org.springframework.data.jpa.repository.JpaRepository
+import java.time.LocalDateTime
+import java.util.*
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+interface ScheduleRepository : JpaRepository<Schedule, Long> {
+    fun findOverlappingSchedules(
+        calendarId: Long,
+        startTime: LocalDateTime,
+        endTime: LocalDateTime
+    ): List<Schedule>
 
-public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
+    fun findSchedulesByCalendarAndDateRange(
+        calendarId: Long,
+        startDate: LocalDateTime,
+        endDate: LocalDateTime
+    ): List<Schedule>
 
-    // NamedQuery "Schedule.findOverlappingSchedules"를 사용
-    List<Schedule> findOverlappingSchedules(@Param("calendarId") Long calendarId,
-                                            @Param("startTime") LocalDateTime startTime,
-                                            @Param("endTime") LocalDateTime endTime);
-
-    // NamedQuery "Schedule.findSchedulesByCalendarAndDateRange"를 사용
-    List<Schedule> findSchedulesByCalendarAndDateRange(@Param("calendarId") Long calendarId,
-                                                       @Param("startDate") LocalDateTime startDate,
-                                                       @Param("endDate") LocalDateTime endDate);
-
-    Optional<Schedule> findTopByOrderByIdDesc();
+    fun findTopByOrderByIdDesc(): Optional<Schedule>
 }
