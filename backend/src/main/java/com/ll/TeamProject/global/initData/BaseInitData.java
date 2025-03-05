@@ -79,7 +79,7 @@ public class BaseInitData {
             for (int i = 1; i <= 13; i++) {
                 SiteUser user = new SiteUser(
                         "user" + i,
-                        passwordEncoder.encode("admin" + i),
+                        passwordEncoder.encode("1234"),
                         "회원" + i,
                         "user" + i + "@test.com",
                         USER,
