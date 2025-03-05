@@ -1,7 +1,7 @@
-package com.ll.TeamProject.domain.user.dto;
+package com.ll.TeamProject.domain.user.dto
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank
 
-public record ModifyUserReqBody (
-        @NotBlank String nickname
-) {}
+data class ModifyUserReqBody(
+    @field:NotBlank val nickname: String
+)

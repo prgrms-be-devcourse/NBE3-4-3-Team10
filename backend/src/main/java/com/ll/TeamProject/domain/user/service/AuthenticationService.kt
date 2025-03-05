@@ -1,48 +1,42 @@
-package com.ll.TeamProject.domain.user.service;
+package com.ll.TeamProject.domain.user.service
 
-import com.ll.TeamProject.domain.user.entity.Authentication;
-import com.ll.TeamProject.domain.user.entity.SiteUser;
-import com.ll.TeamProject.domain.user.repository.AuthenticationRepository;
-import com.ll.TeamProject.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
+import com.ll.TeamProject.domain.user.entity.Authentication
+import com.ll.TeamProject.domain.user.entity.SiteUser
+import com.ll.TeamProject.domain.user.repository.AuthenticationRepository
+import com.ll.TeamProject.domain.user.repository.UserRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
-@RequiredArgsConstructor
-public class AuthenticationService {
+class AuthenticationService(
+    private val authenticationRepository: AuthenticationRepository,
+    private val userRepository: UserRepository
+) {
 
-    private final AuthenticationRepository authenticationRepository;
-    private final UserRepository userRepository;
-
-    public void modifyLastLogin(SiteUser user) {
-        authenticationRepository.findByUserId(user.getId())
-                .ifPresent(authentication -> {
-                    authentication.setLastLogin();
-                    authentication.resetFailedAttempts();
-                    authenticationRepository.save(authentication);
-                });
+    fun modifyLastLogin(user: SiteUser) {
+        authenticationRepository.findByUserId(user.id!!)
+            .ifPresent { authentication: Authentication ->
+                authentication.updateLastLogin()
+                authentication.resetFailedAttempts()
+                authenticationRepository.save(authentication)
+            }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void handleLoginFailure(SiteUser user) {
-        authenticationRepository.findByUserId(user.getId()).ifPresent(authentication -> {
-
-            int failedLogin = authentication.failedLogin();
-
+    fun handleLoginFailure(user: SiteUser) {
+        authenticationRepository.findByUserId(user.id!!).ifPresent { authentication: Authentication ->
+            val failedLogin = authentication.incrementFailedAttempts()
             if (failedLogin >= 5) {
-                user.lockAccount();
-                userRepository.save(user);
+                user.lockAccount()
+                userRepository.save(user)
             }
-
-            authenticationRepository.save(authentication);
-        });
+            authenticationRepository.save(authentication)
+        }
     }
 
-    public Optional<Authentication> findByUserId(Long id) {
-        return authenticationRepository.findByUserId(id);
+    fun findByUserId(id: Long): Optional<Authentication> {
+        return authenticationRepository.findByUserId(id)
     }
 }

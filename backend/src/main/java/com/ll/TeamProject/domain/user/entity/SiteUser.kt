@@ -1,130 +1,120 @@
-package com.ll.TeamProject.domain.user.entity;
+package com.ll.TeamProject.domain.user.entity
 
-import com.ll.TeamProject.domain.user.enums.Role;
-import com.ll.TeamProject.global.jpa.entity.BaseTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import com.ll.TeamProject.domain.user.enums.Role
+import com.ll.TeamProject.global.jpa.entity.BaseTime
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import java.time.LocalDateTime
+import java.util.*
 
 @Entity
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class SiteUser extends BaseTime {
-    // BaseTime : id (BaseEntity, no setter), 생성/수정일
+class SiteUser(
+    @Column(unique = true)
+    var username: String,
 
     @Column(unique = true)
-    private String username;
-
-    @Column(unique = true)
-    private String nickname;
+    var nickname: String,
 
     @Column
-    private String password;
+    var password: String,
 
     @Column(unique = true)
-    private String email;
+    var email: String,
 
-    @Column
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column
+    var role: Role,
 
     @Column(unique = true)
-    private String apiKey;
+    var apiKey: String,
 
     @Column
-    private boolean isDeleted;
+    var isDeleted: Boolean = false,
 
     @Column
-    private LocalDateTime deletedDate;
+    var deletedDate: LocalDateTime? = null,
 
     @Column
-    private boolean locked;
+    var locked: Boolean = false
+) : BaseTime() {
 
-    public SiteUser(long id, String username, String nickname, Role role) {
-        super();
-        this.setId(id);
-        this.username = username;
-        this.nickname = nickname;
-        this.role = role;
+    protected constructor() : this("", "", "", "", Role.USER, "", false, null, false) // JPA 기본 생성자
+
+    // TODO: 생성자 리팩토링 필요
+    constructor(id: Long, username: String, nickname: String, role: Role) : this() {
+        this.id = id
+        this.username = username
+        this.nickname = nickname
+        this.role = role
     }
 
-    public SiteUser(long id, String username, Role role) {
-        super();
-        this.setId(id);
-        this.username = username;
-        this.role = role;
+    constructor(id: Long, username: String) : this() {
+        this.id = id
+        this.username = username
     }
 
-    public SiteUser(long id, String username) {
-        super();
-        this.setId(id);
-        this.username = username;
+    constructor(username: String) : this() {
+        this.username = username
     }
 
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getAuthoritiesAsString()
-                .stream()
-                .map(SimpleGrantedAuthority::new)
-                .toList();
+    constructor(username: String, password: String, nickname: String, email: String, role: Role, apiKey: String) : this() {
+        this.username = username
+        this.password = password
+        this.nickname = nickname
+        this.email = email
+        this.role = role
+        this.apiKey = apiKey
     }
 
-    private List<String> getAuthoritiesAsString() {
-        List<String> authorities = new ArrayList<>();
-
-        if (isAdmin()) authorities.add("ROLE_ADMIN");
-
-        return authorities;
+    constructor(username: String, password: String, nickname: String, email: String, role: Role, apiKey: String, isDeleted: Boolean, deletedDate: LocalDateTime) : this() {
+        this.username = username
+        this.nickname = nickname
+        this.password = password
+        this.role = role
+        this.email = email
+        this.apiKey = apiKey
+        this.isDeleted = isDeleted
+        this.deletedDate = deletedDate
     }
 
-    private boolean isAdmin() {
-        return this.role == Role.ADMIN;
+    fun getAuthorities(): Collection<GrantedAuthority> =
+        getAuthoritiesAsString().map { SimpleGrantedAuthority(it) }
+
+    private fun getAuthoritiesAsString(): List<String> =
+        mutableListOf<String>().apply {
+            if (isAdmin()) add("ROLE_ADMIN")
+        }
+
+    fun isLocked(): Boolean = locked
+
+    private fun isAdmin(): Boolean = this.role == Role.ADMIN
+
+    fun changeNickname(newNickname: String) {
+        this.nickname = newNickname
     }
 
-    public void changeNickname(String newNickname) {
-        this.nickname = newNickname;
+    fun delete() {
+        val randomSuffix = UUID.randomUUID()
+        this.username = "deleted_$randomSuffix"
+        this.email = "$username@deleted.com"
+        changeNickname("탈퇴한 사용자_$username")
+        this.isDeleted = true
+        this.deletedDate = LocalDateTime.now()
     }
 
-    public void delete() {
-        this.username = "deleted_" + UUID.randomUUID();
-        this.email = username + "@deleted.com";
-        changeNickname("탈퇴한 사용자_" + username);
-        this.isDeleted = true;
-        this.deletedDate = LocalDateTime.now();
+    fun lockAccount() {
+        this.locked = true
     }
 
-    public boolean isLocked() {
-        return this.locked;
+    fun unlockAccount() {
+        this.locked = false
     }
 
-    public void lockAccountAndResetPassword(String randomPassword) {
-        this.locked = true;
-        this.password = randomPassword;
-    }
-
-    public void lockAccount() {
-        this.locked = true;
-    }
-
-    public void unlockAccount() {
-        this.locked = false;
-    }
-
-    public void changePassword(String password) {
-        this.password = password;
+    fun changePassword(password: String) {
+        this.password = password
     }
 }

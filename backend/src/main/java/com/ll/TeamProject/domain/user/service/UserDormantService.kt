@@ -1,83 +1,82 @@
-package com.ll.TeamProject.domain.user.service;
+package com.ll.TeamProject.domain.user.service
 
-import com.ll.TeamProject.domain.user.dto.DormantAccountProjection;
-import com.ll.TeamProject.domain.user.repository.AuthenticationRepository;
-import com.ll.TeamProject.domain.user.repository.UserRepository;
-import com.ll.TeamProject.global.mail.GoogleMailService;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.function.Consumer;
+import com.ll.TeamProject.domain.user.dto.DormantAccountProjection
+import com.ll.TeamProject.domain.user.repository.AuthenticationRepository
+import com.ll.TeamProject.domain.user.repository.UserRepository
+import com.ll.TeamProject.global.mail.GoogleMailService
+import jakarta.transaction.Transactional
+import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.util.function.Consumer
+import kotlin.math.min
 
 @Service
-@RequiredArgsConstructor
-public class UserDormantService {
-
-    private final AuthenticationRepository authenticationRepository;
-    private final GoogleMailService emailService;
-    private final UserService userService;
-    private final UserRepository userRepository;
+class UserDormantService(
+    private val authenticationRepository: AuthenticationRepository,
+    private val emailService: GoogleMailService,
+    private val userRepository: UserRepository
+) {
 
     @Transactional
-    public void processDormant() {
+    fun processDormant() {
         // 기준 날짜 설정 (매월 1일 실행)
-        YearMonth currentMonth = YearMonth.now();
+        val currentMonth = YearMonth.now()
 
         // 1. 휴면 안내 메일 전송 (닉네임과 이메일만 조회)
-        List<DormantAccountProjection> notifyCandidates = findCandidatesByMonthsAgo(11);
-        sendDormantNotificationEmail(notifyCandidates, currentMonth.plusMonths(1));
+        val notifyCandidates = findCandidatesByMonthsAgo(11)
+        sendDormantNotificationEmail(notifyCandidates, currentMonth.plusMonths(1))
 
         // 2. 계정 잠금 (id 만 조회 후 한번에 100명씩 처리)
-        List<Long> lockIds = findUserIdsByMonthsAgo(12);
-        processInBatches(lockIds, 100, userRepository::bulkLockAccounts);
+        val lockIds = findUserIdsByMonthsAgo(12)
+        processInBatches(lockIds, 100) {
+            ids: List<Long> -> userRepository.bulkLockAccounts(ids)
+        }
 
         // 3. 삭제 처리 (id 만 조회 후 한번에 100명씩 처리)
-        List<Long> deleteIds = findUserIdsByMonthsAgo(18);
-        processInBatches(deleteIds, 100,
-                ids -> userRepository.bulkDeleteAccounts(ids, LocalDateTime.now()));
+        val deleteIds = findUserIdsByMonthsAgo(18)
+        processInBatches(deleteIds, 100) {
+            ids: List<Long> -> userRepository.bulkDeleteAccounts(ids, LocalDateTime.now())
+        }
     }
 
-    private List<DormantAccountProjection> findCandidatesByMonthsAgo(int monthsAgo) {
-        LocalDateTime[] dateRange = calculateDateRange(monthsAgo);
-        return authenticationRepository.findDormantAccountsInDateRange(dateRange[0], dateRange[1]);
+    fun findCandidatesByMonthsAgo(monthsAgo: Int): List<DormantAccountProjection> {
+        val dateRange = calculateDateRange(monthsAgo)
+        return authenticationRepository.findDormantAccountsInDateRange(dateRange[0], dateRange[1])
     }
 
-    private List<Long> findUserIdsByMonthsAgo(int monthsAgo) {
-        LocalDateTime[] dateRange = calculateDateRange(monthsAgo);
-        return userRepository.findUserIdsInDateRange(dateRange[0], dateRange[1]);
+    fun findUserIdsByMonthsAgo(monthsAgo: Int): List<Long> {
+        val dateRange = calculateDateRange(monthsAgo)
+        return userRepository.findUserIdsInDateRange(dateRange[0], dateRange[1])
     }
 
-    private LocalDateTime[] calculateDateRange(int monthsAgo) {
-        YearMonth targetMonth = YearMonth.now().minusMonths(monthsAgo);
-        LocalDateTime startDate = targetMonth.atDay(1).atStartOfDay();
-        LocalDateTime endDate = targetMonth.atEndOfMonth().atTime(LocalTime.MAX);
-        return new LocalDateTime[] { startDate, endDate };
+    private fun calculateDateRange(monthsAgo: Int): Array<LocalDateTime> {
+        val targetMonth = YearMonth.now().minusMonths(monthsAgo.toLong())
+        val startDate = targetMonth.atDay(1).atStartOfDay()
+        val endDate = targetMonth.atEndOfMonth().atTime(LocalTime.MAX)
+        return arrayOf(startDate, endDate)
     }
 
-    private void sendDormantNotificationEmail(List<DormantAccountProjection> candidates, YearMonth nextMonth) {
-        LocalDate nextMonthDate = nextMonth.atDay(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일");
+    private fun sendDormantNotificationEmail(candidates: List<DormantAccountProjection>, nextMonth: YearMonth) {
+        val nextMonthDate = nextMonth.atDay(1)
+        val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일")
 
-        candidates.forEach(candidate -> {
-            String message = """
-                    장기 미사용 이용자로 %s님 계정이 %s 휴면계정으로 전환될 예정입니다.
-                    """.formatted(candidate.getNickname(), nextMonthDate.format(formatter));
-            emailService.sendMail(candidate.getEmail(), "CanBeJ 휴면계정 전환 안내", message);
-        });
+        candidates.forEach { candidate: DormantAccountProjection ->
+            val message =
+                "장기 미사용 이용자로 ${candidate.nickname} 님 계정이 ${nextMonthDate.format(formatter)} 휴면계정으로 전환될 예정입니다."
+            emailService.sendMail(candidate.email, "CanBeJ 휴면계정 전환 안내", message)
+        }
     }
 
-    private <T> void processInBatches(List<T> ids, int batchSize, Consumer<List<T>> processor) {
-        for (int i = 0; i < ids.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, ids.size());
-            List<T> batch = ids.subList(i, end);
-            processor.accept(batch);
+    fun <T> processInBatches(ids: List<T>, batchSize: Int, processor: Consumer<List<T>>) {
+        var i = 0
+        while (i < ids.size) {
+            val end = min((i + batchSize).toDouble(), ids.size.toDouble()).toInt()
+            val batch = ids.subList(i, end)
+            processor.accept(batch)
+            i += batchSize
         }
     }
 }

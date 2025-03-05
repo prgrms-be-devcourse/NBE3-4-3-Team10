@@ -1,26 +1,23 @@
-package com.ll.TeamProject.global.redis;
+package com.ll.TeamProject.global.redis
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.stereotype.Service
+import java.time.Duration
 
 @Service
-@RequiredArgsConstructor
-public class RedisService {
-    private final StringRedisTemplate redisTemplate;
+class RedisService(
+    private val redisTemplate: StringRedisTemplate
+) {
 
-    public void setValue(String key, String value, long timeoutSeconds) {
-        redisTemplate.opsForValue().set(key, value, timeoutSeconds, TimeUnit.SECONDS);
+    fun setValue(key: String, value: String, timeoutSeconds: Long) {
+        redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(timeoutSeconds))
     }
 
-    public Optional<String> getValue(String key) {
-        return Optional.ofNullable(redisTemplate.opsForValue().get(key));
+    fun getValue(key: String): String? {
+        return redisTemplate.opsForValue().get(key)
     }
 
-    public void deleteValue(String key) {
-        redisTemplate.delete(key);
+    fun deleteValue(key: String) {
+        redisTemplate.delete(key)
     }
 }

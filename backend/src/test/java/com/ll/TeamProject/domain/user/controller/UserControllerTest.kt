@@ -1,79 +1,74 @@
-package com.ll.TeamProject.domain.user.controller;
+package com.ll.TeamProject.domain.user.controller
 
-import com.ll.TeamProject.domain.user.TestUserHelper;
-import com.ll.TeamProject.domain.user.entity.SiteUser;
-import com.ll.TeamProject.domain.user.service.UserService;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.transaction.annotation.Transactional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.ll.TeamProject.domain.user.TestUserHelper
+import com.ll.TeamProject.domain.user.service.UserService
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Transactional
-class UserControllerTest {
+internal class UserControllerTest {
+    @Autowired
+    private lateinit var userService: UserService
 
     @Autowired
-    private UserService userService;
-    @Autowired
-    private TestUserHelper testUserHelper;
+    private lateinit var testUserHelper: TestUserHelper
 
     @Test
     @DisplayName("사용자 탈퇴")
-    void deleteUser() throws Exception {
-        String username = "user1";
-        SiteUser actor = userService.findByUsername(username).get();
-        MockHttpServletRequestBuilder request = delete("/api/user/%d".formatted(actor.getId()));
+    fun deleteUser() {
+        val username = "user1"
+        val actor = userService.findByUsername(username).get()
+        val request = MockMvcRequestBuilders.delete("/api/user/${actor.id}")
 
-        ResultActions resultActions = testUserHelper.requestWithUserAuth(username, request);
+        val resultActions = testUserHelper.requestWithUserAuth(username, request)
 
-        SiteUser deletedUser = userService.findById(actor.getId()).get();
+        val deletedUser = userService.findById(actor.id!!).get()
 
-        assertThat(deletedUser.getNickname()).startsWith("탈퇴한 사용자");
-        assertThat(deletedUser.getCreateDate().toString()).startsWith(actor.getCreateDate().toString().substring(0, 25));
-        assertThat(deletedUser.getModifyDate().toString()).startsWith(actor.getModifyDate().toString().substring(0, 25));
+        Assertions.assertThat(deletedUser.nickname).startsWith("탈퇴한 사용자")
+        Assertions.assertThat(deletedUser.createDate.toString())
+            .startsWith(actor.createDate.toString().substring(0, 25))
+        Assertions.assertThat(deletedUser.modifyDate.toString())
+            .startsWith(actor.modifyDate.toString().substring(0, 25))
 
         resultActions
-                .andExpect(status().isNoContent());
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
     }
 
     @Test
     @DisplayName("닉네임 변경, TestUserHelper 테스트")
-    void changeNicknameAndUserHelperTest() throws Exception {
-        String username = "user1";
+    fun changeNicknameAndUserHelperTest() {
+        val username = "user1"
         // 요청 생성
-        MockHttpServletRequestBuilder request =
-                post("/api/user")
-                    .content("""
-                            {
-                                "nickname": "changedNickname"
-                            }
-                            """.stripIndent());
+        val request =
+            MockMvcRequestBuilders.post("/api/user")
+                .content("""
+                    {
+                        "nickname": "changedNickname"
+                    }
+                    """.trimIndent())
 
         // 인증 원하는 username 과 요청으로 도우미 메서드 호출
-        ResultActions resultActions = testUserHelper.requestWithUserAuth(username, request);
+        val resultActions = testUserHelper.requestWithUserAuth(username, request)
 
         // 결과 확인
         resultActions
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value("true"))
-                .andExpect(jsonPath("$.code").value("SUCCESS"))
-                .andExpect(jsonPath("$.msg").value("사용자 정보가 수정되었습니다."));
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.success").value("true"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("SUCCESS"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.msg").value("사용자 정보가 수정되었습니다."))
 
-        SiteUser actor = userService.findByUsername(username).get();
-        assertThat(actor.getNickname()).isEqualTo("changedNickname");
+        val actor = userService.findByUsername(username).get()
+        Assertions.assertThat(actor.nickname).isEqualTo("changedNickname")
     }
-
 }

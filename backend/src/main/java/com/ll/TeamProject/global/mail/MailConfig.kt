@@ -1,31 +1,26 @@
-package com.ll.TeamProject.global.mail;
+package com.ll.TeamProject.global.mail
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-
-import java.util.Properties;
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.mail.javamail.JavaMailSenderImpl
 
 @Configuration
-@RequiredArgsConstructor
-public class MailConfig {
-
-    private final MailProperties mailProperties;
+class MailConfig(
+    private val mailProperties: MailProperties
+) {
 
     @Bean
-    public JavaMailSender mailSender() {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+    fun mailSender(): JavaMailSender {
+        return JavaMailSenderImpl().apply {
+            host = mailProperties.host
+            port = mailProperties.port
+            username = mailProperties.username
+            password = mailProperties.password
 
-        mailSender.setHost(mailProperties.getHost());
-        mailSender.setPort(mailProperties.getPort());
-        mailSender.setUsername(mailProperties.getUsername());
-        mailSender.setPassword(mailProperties.getPassword());
-
-        Properties props = mailSender.getJavaMailProperties();
-        props.putAll(mailProperties.getProperties());
-
-        return mailSender;
+            javaMailProperties.apply {
+                putAll(mailProperties.properties)
+            }
+        }
     }
 }

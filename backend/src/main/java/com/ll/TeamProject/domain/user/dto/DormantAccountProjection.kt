@@ -1,6 +1,6 @@
-package com.ll.TeamProject.domain.user.dto;
+package com.ll.TeamProject.domain.user.dto
 
-public interface DormantAccountProjection {
-    String getNickname();
-    String getEmail();
+interface DormantAccountProjection {
+    val nickname: String
+    val email: String
 }

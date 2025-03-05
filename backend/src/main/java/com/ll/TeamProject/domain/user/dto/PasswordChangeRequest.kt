@@ -1,7 +1,7 @@
-package com.ll.TeamProject.domain.user.dto;
+package com.ll.TeamProject.domain.user.dto
 
-import lombok.NonNull;
+import jakarta.validation.constraints.NotBlank
 
-public record PasswordChangeRequest(
-        @NonNull String password
-) {}
+data class PasswordChangeRequest(
+    @field:NotBlank val password: String
+)

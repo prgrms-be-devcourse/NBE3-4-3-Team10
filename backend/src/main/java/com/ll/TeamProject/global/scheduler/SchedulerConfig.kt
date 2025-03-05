@@ -1,16 +1,15 @@
-package com.ll.TeamProject.global.scheduler;
+package com.ll.TeamProject.global.scheduler
 
-import com.ll.TeamProject.domain.user.service.UserDormantService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import com.ll.TeamProject.domain.user.service.UserDormantService
+import org.springframework.stereotype.Component
 
 @Component
-@RequiredArgsConstructor
-public class SchedulerConfig {
-    private final UserDormantService userDormantService;
+class SchedulerConfig(
+    private val userDormantService: UserDormantService
+) {
 
 //    @Scheduled(cron = "0 0 10 1 * ?")
-    public void processDormantAccounts() {
-        userDormantService.processDormant();
+    fun processDormantAccounts() {
+        userDormantService.processDormant()
     }
 }

@@ -1,7 +1,7 @@
-package com.ll.TeamProject.domain.user.dto;
+package com.ll.TeamProject.domain.user.dto
 
-public record LoginDto(
-        UserDto item,
-        String apiKey,
-        String accessToken
-) { }
+data class LoginDto(
+    val item: UserDto,
+    val apiKey: String,
+    val accessToken: String
+)

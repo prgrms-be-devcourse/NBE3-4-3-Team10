@@ -1,9 +1,9 @@
-package com.ll.TeamProject.global.exceptions;
+package com.ll.TeamProject.global.exceptions
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatus
 
-public interface ErrorCode {
-    HttpStatus getStatus();
-    String getCode();
-    String getMessage();
+interface ErrorCode {
+    val status: HttpStatus
+    val code: String
+    val message: String
 }

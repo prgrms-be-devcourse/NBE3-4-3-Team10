@@ -1,33 +1,30 @@
-package com.ll.TeamProject.global.security;
+package com.ll.TeamProject.global.security
 
-import com.ll.TeamProject.domain.user.entity.SiteUser;
-import com.ll.TeamProject.global.userContext.UserContext;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import org.springframework.stereotype.Component;
+import com.ll.TeamProject.domain.user.exceptions.UserErrorCode
+import com.ll.TeamProject.global.exceptions.CustomException
+import com.ll.TeamProject.global.userContext.UserContext
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.core.Authentication
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler
+import org.springframework.stereotype.Component
 
 @Component
-@RequiredArgsConstructor
-public class CustomOAuth2AuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+class CustomOAuth2AuthenticationSuccessHandler(
+    private val userContext: UserContext,
 
-    private final UserContext userContext;
+    @Value("\${custom.dev.frontUrl}")
+    private val devFrontUrl: String
+) : SavedRequestAwareAuthenticationSuccessHandler() {
 
-    @Value("${custom.dev.frontUrl}")
-    private String devFrontUrl;
-
-    @SneakyThrows
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-
-        SiteUser user = userContext.findActor().get();
-
-        userContext.makeAuthCookies(user);
-
-        response.sendRedirect(devFrontUrl + "/calendars/");
+    override fun onAuthenticationSuccess(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        authentication: Authentication
+    ) {
+        val user = userContext.findActor() ?: throw CustomException(UserErrorCode.UNAUTHORIZED)
+        userContext.makeAuthCookies(user)
+        response.sendRedirect("$devFrontUrl/calendars/")
     }
 }

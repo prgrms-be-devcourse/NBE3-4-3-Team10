@@ -1,52 +1,46 @@
-package com.ll.TeamProject.domain.user.service;
+package com.ll.TeamProject.domain.user.service
 
-import com.ll.TeamProject.domain.user.entity.Authentication;
-import com.ll.TeamProject.domain.user.entity.SiteUser;
-import com.ll.TeamProject.domain.user.enums.AuthType;
-import com.ll.TeamProject.domain.user.repository.AuthenticationRepository;
-import com.ll.TeamProject.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.UUID;
-
-import static com.ll.TeamProject.domain.user.enums.Role.USER;
+import com.ll.TeamProject.domain.user.entity.Authentication.Companion.create
+import com.ll.TeamProject.domain.user.entity.SiteUser
+import com.ll.TeamProject.domain.user.enums.AuthType
+import com.ll.TeamProject.domain.user.enums.Role
+import com.ll.TeamProject.domain.user.repository.AuthenticationRepository
+import com.ll.TeamProject.domain.user.repository.UserRepository
+import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
-@RequiredArgsConstructor
-public class JoinService {
+class JoinService(
+    private val userRepository: UserRepository,
+    private val authenticationRepository: AuthenticationRepository
+) {
 
-    private final UserRepository userRepository;
-    private final AuthenticationRepository authenticationRepository;
-
-    public SiteUser findOrRegisterUser(String username, String email, String providerTypeCode) {
+    fun findOrRegisterUser(username: String, email: String, providerTypeCode: String): SiteUser {
         return userRepository.findByUsername(username)
-                .or(() -> userRepository.findByEmail(email))
-                .orElseGet(() -> join(username, "", email, providerTypeCode));
+            .or { userRepository.findByEmail(email) }
+            .orElseGet { join(username, "", email, providerTypeCode) }
     }
 
-    public SiteUser join(String username, String password, String email, String providerTypeCode) {
-        SiteUser user = SiteUser.builder()
-                .username(username)
-                .password(password)
-                .nickname(username)
-                .email(email)
-                .role(USER)
-                .apiKey(UUID.randomUUID().toString())
-                .locked(false)
-                .build();
-        user = userRepository.save(user);
+    fun join(username: String, password: String, email: String, providerTypeCode: String): SiteUser {
+        val user = SiteUser(
+            username,
+            password,
+            username,
+            email,
+            Role.USER,
+            UUID.randomUUID().toString()
+        )
+        userRepository.save(user)
 
-        AuthType authType = AuthType.valueOf(providerTypeCode);
-        Authentication authentication = Authentication
-                .builder()
-                .user(user)
-                .authType(authType)
-                .failedAttempts(0)
-                .build();
-        authenticationRepository.save(authentication);
+        val authType = AuthType.valueOf(providerTypeCode)
+        val authentication = create(
+            user,
+            authType,
+            null,
+            0
+        )
+        authenticationRepository.save(authentication)
 
-        return user;
+        return user
     }
-
 }

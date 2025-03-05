@@ -1,21 +1,14 @@
-package com.ll.TeamProject.domain.user.entity;
+package com.ll.TeamProject.domain.user.entity
 
-import com.ll.TeamProject.global.jpa.entity.BaseTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.ll.TeamProject.global.jpa.entity.BaseTime
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
 
 @Entity
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ForbiddenNickname extends BaseTime {
-    // BaseTime : id (BaseEntity, no setter), 생성/수정일
-
+class ForbiddenNickname(
     @Column(unique = true)
-    private String forbiddenName;
+    var forbiddenName: String
+) : BaseTime() {
+
+    protected constructor() : this("")
 }

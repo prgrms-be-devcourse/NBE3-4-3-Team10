@@ -1,48 +1,45 @@
-package com.ll.TeamProject.domain.user.entity;
+package com.ll.TeamProject.domain.user.entity
 
-import com.ll.TeamProject.domain.user.enums.AuthType;
-import com.ll.TeamProject.global.jpa.entity.BaseEntity;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import com.ll.TeamProject.domain.user.enums.AuthType
+import com.ll.TeamProject.domain.user.enums.Role
+import com.ll.TeamProject.global.jpa.entity.BaseEntity
+import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Authentication extends BaseEntity {
-    // BaseEntity : id (no setter)
+class Authentication(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private SiteUser user;
+    val user: SiteUser,
 
     @Enumerated(EnumType.STRING)
-    private AuthType authType;
+    val authType: AuthType,
 
-    @Column
-    private LocalDateTime lastLogin;
+    var lastLogin: LocalDateTime? = null,
 
-    @Column
-    private int failedAttempts;
+    var failedAttempts: Int = 0,
 
-    @Column
-    private boolean isLocked;
+    var isLocked: Boolean = false
+) : BaseEntity() {
+    protected constructor() : this(SiteUser("", "", "", "", Role.USER, "", false, null, false), AuthType.LOCAL)
 
-    public void setLastLogin() {
-        this.lastLogin = LocalDateTime.now();
+    fun updateLastLogin() {
+        lastLogin = LocalDateTime.now()
     }
 
-    public int failedLogin() {
-        this.failedAttempts = this.failedAttempts + 1;
-        return failedAttempts;
+    fun incrementFailedAttempts(): Int {
+        return ++failedAttempts
     }
 
-    public void resetFailedAttempts() {
-        this.failedAttempts = 0;
+    fun resetFailedAttempts() {
+        failedAttempts = 0
+    }
+
+    companion object {
+        @JvmStatic // TODO: 테스트 코드에서 필요
+        fun create(user: SiteUser, authType: AuthType, lastLogin: LocalDateTime? = null, failedAttempts: Int = 0): Authentication {
+            return Authentication(user, authType, lastLogin, failedAttempts, false)
+        }
     }
 }
+

@@ -1,15 +1,11 @@
-package com.ll.TeamProject.global.globalExceptionHandler;
+package com.ll.TeamProject.global.globalExceptionHandler
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Getter
-@AllArgsConstructor
-public class ErrorResponse {
+data class ErrorResponse(
     @JsonProperty("errorCode")
-    private String errorCode;
+    val errorCode: String,
 
     @JsonProperty("msg")
-    private String msg;
-}
+    val msg: String
+)

@@ -1,19 +1,6 @@
-package com.ll.TeamProject.global.exceptions;
+package com.ll.TeamProject.global.exceptions
 
-import com.ll.TeamProject.domain.user.exceptions.UserErrorCode;
-import lombok.Getter;
-
-@Getter
-public class CustomException extends RuntimeException {
-    private final UserErrorCode errorCode;
-
-    public CustomException(UserErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
-    }
-
-    public CustomException(UserErrorCode errorCode, String detail) {
-        super(detail);
-        this.errorCode = errorCode;
-    }
-}
+open class CustomException @JvmOverloads constructor(
+    val errorCode: ErrorCode,
+    message: String = errorCode.message // 기본값을 errorCode의 메시지로 설정
+) : RuntimeException(message)

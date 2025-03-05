@@ -1,5 +1,6 @@
-package com.ll.TeamProject.domain.user.enums;
+package com.ll.TeamProject.domain.user.enums
 
-public enum AuthType {
+enum class AuthType {
     KAKAO, GOOGLE, NAVER, LOCAL
 }
+

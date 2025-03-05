@@ -1,6 +1,6 @@
-package com.ll.TeamProject.domain.user.enums;
+package com.ll.TeamProject.domain.user.enums
 
-public enum Role {
+enum class Role {
     ADMIN,
     USER
 }

@@ -1,56 +1,67 @@
-package com.ll.TeamProject.domain.user.repository;
+package com.ll.TeamProject.domain.user.repository
 
-import com.ll.TeamProject.domain.user.entity.SiteUser;
-import com.ll.TeamProject.domain.user.enums.Role;
-import io.lettuce.core.dynamic.annotation.Param;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import com.ll.TeamProject.domain.user.entity.SiteUser
+import com.ll.TeamProject.domain.user.enums.Role
+import io.lettuce.core.dynamic.annotation.Param
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
+import java.time.LocalDateTime
+import java.util.*
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+interface UserRepository : JpaRepository<SiteUser, Long> {
+    fun findByUsername(username: String): Optional<SiteUser>
 
-public interface UserRepository extends JpaRepository<SiteUser, Long> {
-    Optional<SiteUser> findByUsername(String username);
+    fun findByApiKey(apiKey: String): Optional<SiteUser>
 
-    Optional<SiteUser> findByApiKey(String apiKey);
+    fun findByRoleAndEmailLikeAndIsDeletedFalse(
+        role: Role,
+        emailLike: String,
+        pageRequest: PageRequest
+    ): Page<SiteUser>
 
-    Page<SiteUser> findByRoleAndEmailLikeAndIsDeletedFalse(Role role, String emailLike, PageRequest pageRequest);
+    fun findByRoleAndUsernameLikeAndIsDeletedFalse(
+        role: Role,
+        usernameLike: String,
+        pageRequest: PageRequest
+    ): Page<SiteUser>
 
-    Page<SiteUser> findByRoleAndUsernameLikeAndIsDeletedFalse(Role role, String usernameLike, PageRequest pageRequest);
+    fun findByRoleAndIsDeletedFalse(role: Role, pageRequest: PageRequest): Page<SiteUser>
 
-    Optional<SiteUser> findByUsernameAndEmail(String username, String email);
+    fun findByEmail(email: String): Optional<SiteUser>
 
-    Page<SiteUser> findByRoleAndIsDeletedFalse(Role role, PageRequest pageRequest);
-
-    Optional<SiteUser> findByEmail(String email);
-
-    @Query("""
+    @Query(
+        """
         SELECT a.user.id
         FROM Authentication a
         JOIN a.user u
         WHERE a.lastLogin BETWEEN :startDate AND :endDate
         AND u.isDeleted = false
-    """)
-    List<Long> findUserIdsInDateRange(@Param("startDate") LocalDateTime startDate,
-                                        @Param("endDate") LocalDateTime endDate);
+        """
+    )
+    fun findUserIdsInDateRange(
+        @Param("startDate") startDate: LocalDateTime,
+        @Param("endDate") endDate: LocalDateTime
+    ): List<Long>
 
     @Modifying
     @Query("UPDATE SiteUser u SET u.locked = true WHERE u.id IN :ids")
-    void bulkLockAccounts(@Param("ids") List<Long> ids);
+    fun bulkLockAccounts(@Param("ids") ids: List<Long>)
 
     @Modifying
-    @Query("""
-    UPDATE SiteUser u
-    SET u.username = CONCAT('deleted_', UUID()), 
-        u.email = CONCAT('deleted_', UUID(), '@deleted.com'), 
-        u.nickname = CONCAT('탈퇴한 사용자_', u.username), 
-        u.isDeleted = true, 
-        u.deletedDate = :deletedDate
-    WHERE u.id IN :userIds
-""")
-    void bulkDeleteAccounts(@Param("userIds") List<Long> userIds, @Param("deletedDate") LocalDateTime deletedDate);
+    @Query(
+        """
+        UPDATE SiteUser u
+        SET u.username = CONCAT('deleted_', UUID()), 
+            u.email = CONCAT('deleted_', UUID(), '@deleted.com'), 
+            u.nickname = CONCAT('탈퇴한 사용자_', u.username), 
+            u.isDeleted = true, 
+            u.deletedDate = :deletedDate
+        WHERE u.id IN :userIds
+        """
+    )
+    fun bulkDeleteAccounts(@Param("userIds") userIds: List<Long>,
+                           @Param("deletedDate") deletedDate: LocalDateTime)
 }

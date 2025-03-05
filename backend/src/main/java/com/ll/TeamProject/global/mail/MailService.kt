@@ -1,6 +1,6 @@
-package com.ll.TeamProject.global.mail;
+package com.ll.TeamProject.global.mail
 
-public interface MailService {
-    void sendMail(String to, String subject, String text);
-    void sendVerificationCode(String nickname, String email, String verificationCode);
+interface MailService {
+    fun sendMail(to: String, subject: String, text: String)
+    fun sendVerificationCode(nickname: String, email: String, verificationCode: String)
 }

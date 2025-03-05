@@ -1,20 +1,13 @@
-package com.ll.TeamProject.domain.user.dto;
+package com.ll.TeamProject.domain.user.dto
 
-import com.ll.TeamProject.domain.user.entity.ForbiddenNickname;
+import com.ll.TeamProject.domain.user.entity.ForbiddenNickname
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+class ForbiddenNicknameList(forbiddenNames: List<ForbiddenNickname>) {
+    private val forbiddenList: Set<String> = forbiddenNames
+        .map { it.forbiddenName.lowercase() }
+        .toSet()
 
-public class ForbiddenNicknameList {
-    private final Set<String> forbiddenList;
-
-    public ForbiddenNicknameList(List<ForbiddenNickname> forbiddenNames) {
-        this.forbiddenList = forbiddenNames.stream().map(fn -> fn.getForbiddenName().toLowerCase())
-                .collect(Collectors.toSet());
-    }
-
-    public boolean contains(String nickname) {
-        return forbiddenList.stream().anyMatch(nickname.toLowerCase()::contains);
+    fun contains(nickname: String): Boolean {
+        return forbiddenList.any { nickname.lowercase().contains(it) }
     }
 }

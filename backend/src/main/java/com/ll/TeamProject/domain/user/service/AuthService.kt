@@ -1,47 +1,45 @@
-package com.ll.TeamProject.domain.user.service;
+package com.ll.TeamProject.domain.user.service
 
-import com.ll.TeamProject.domain.user.dto.LoginDto;
-import com.ll.TeamProject.domain.user.dto.UserDto;
-import com.ll.TeamProject.domain.user.entity.SiteUser;
-import com.ll.TeamProject.domain.user.exceptions.UserErrorCode;
-import com.ll.TeamProject.domain.user.repository.UserRepository;
-import com.ll.TeamProject.global.exceptions.CustomException;
-import com.ll.TeamProject.global.userContext.UserContext;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.ll.TeamProject.domain.user.dto.LoginDto
+import com.ll.TeamProject.domain.user.dto.UserDto
+import com.ll.TeamProject.domain.user.entity.SiteUser
+import com.ll.TeamProject.domain.user.exceptions.UserErrorCode
+import com.ll.TeamProject.domain.user.repository.UserRepository
+import com.ll.TeamProject.global.exceptions.CustomException
+import com.ll.TeamProject.global.userContext.UserContext
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
 
 @Service
-@RequiredArgsConstructor
-public class AuthService {
-    private final UserRepository userRepository;
-    private final AuthenticationService authenticationService;
-    private final UserContext userContext;
-    private final PasswordEncoder passwordEncoder;
+class AuthService(
+    private val userRepository: UserRepository,
+    private val authenticationService: AuthenticationService,
+    private val userContext: UserContext,
+    private val passwordEncoder: PasswordEncoder
+) {
 
-    public LoginDto login(String username, String password) {
+    fun login(username: String, password: String): LoginDto {
+        val user = userRepository.findByUsername(username)
+            .orElseThrow { CustomException(UserErrorCode.INVALID_CREDENTIALS) }
 
-        SiteUser user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new CustomException(UserErrorCode.INVALID_CREDENTIALS));
+        if (user.isLocked()) throw CustomException(UserErrorCode.ACCOUNT_LOCKED)
 
-        if (user.isLocked()) throw new CustomException(UserErrorCode.ACCOUNT_LOCKED);
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            authenticationService.handleLoginFailure(user);
-            throw new CustomException(UserErrorCode.INVALID_CREDENTIALS);
+        if (!passwordEncoder.matches(password, user.password)) {
+            authenticationService.handleLoginFailure(user)
+            throw CustomException(UserErrorCode.INVALID_CREDENTIALS)
         }
 
-        return createLoginResponse(user);
+        return createLoginResponse(user)
     }
 
-    private LoginDto createLoginResponse(SiteUser user) {
-        authenticationService.modifyLastLogin(user);
-        String accessToken = userContext.makeAuthCookies(user);
-        return new LoginDto(new UserDto(user), user.getApiKey(), accessToken);
+    private fun createLoginResponse(user: SiteUser): LoginDto {
+        authenticationService.modifyLastLogin(user)
+        val accessToken = userContext.makeAuthCookies(user)
+        return LoginDto(UserDto(user), user.apiKey, accessToken)
     }
 
-    public void logout() {
-        SecurityContextHolder.clearContext();
+    fun logout() {
+        SecurityContextHolder.clearContext()
     }
 }

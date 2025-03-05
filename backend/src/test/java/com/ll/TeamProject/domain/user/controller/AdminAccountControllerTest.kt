@@ -1,53 +1,49 @@
-package com.ll.TeamProject.domain.user.controller;
+package com.ll.TeamProject.domain.user.controller
 
-import com.ll.TeamProject.domain.user.entity.SiteUser;
-import com.ll.TeamProject.domain.user.service.UserService;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.ll.TeamProject.domain.user.service.UserService
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Transactional
-class AdminAccountControllerTest {
+internal class AdminAccountControllerTest {
+    @Autowired
+    private lateinit var mvc: MockMvc
 
     @Autowired
-    private MockMvc mvc;
-    @Autowired
-    private UserService userService;
+    private lateinit var userService: UserService
 
     @Test
     @DisplayName("관리자 잠금 해제")
-    @WithMockUser(username = "admin", roles = "ADMIN")
-    void unlockAdmin() throws Exception {
-        SiteUser admin1 = userService.findByUsername("admin1").get();
-        admin1.lockAccount();
+    @WithMockUser(username = "admin", roles = ["ADMIN"])
+    fun unlockAdmin() {
+        val admin1 = userService.findByUsername("admin1").get()
+        admin1.lockAccount()
+        assertThat(admin1.isLocked()).isTrue()
 
-        ResultActions resultActions = mvc
-                .perform(
-                        patch("/api/admin/%d/unlock".formatted(admin1.getId()))
-                )
-                .andDo(print());
+        val resultActions = mvc.perform(
+                MockMvcRequestBuilders.patch("/api/admin/${admin1.id}/unlock")
+            )
+            .andDo(MockMvcResultHandlers.print())
 
         resultActions
-                .andExpect(handler().handlerType(AdminAccountController.class))
-                .andExpect(handler().methodName("unlockAdmin"))
-                .andExpect(status().isNoContent());
+            .andExpect(MockMvcResultMatchers.handler().handlerType(AdminAccountController::class.java))
+            .andExpect(MockMvcResultMatchers.handler().methodName("unlockAdmin"))
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
 
-        assertThat(admin1.isLocked()).isFalse();
+        assertThat(admin1.isLocked()).isFalse()
     }
 }

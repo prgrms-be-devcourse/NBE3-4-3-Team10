@@ -1,8 +1,9 @@
-package com.ll.TeamProject.domain.user.dto;
+package com.ll.TeamProject.domain.user.dto
 
-import lombok.NonNull;
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
 
-public record VerificationCodeRequest(
-        @NonNull String username,
-        @NonNull String email
-) { }
+data class VerificationCodeRequest(
+    @field:NotBlank val username: String,
+    @field:Email val email: String
+)

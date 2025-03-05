@@ -2,9 +2,11 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.4.2"
 	id("io.spring.dependency-management") version "1.1.7"
+
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
 	kotlin("plugin.jpa") version "1.9.25"
+
 }
 
 group = "com.ll"
@@ -73,6 +75,7 @@ dependencies {
 	//  객체 변환 (DTO ↔ Entity 변환)
 	implementation("org.mapstruct:mapstruct:1.6.3")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+
 
 	//  Kotlin 지원
 	implementation(kotlin("stdlib-jdk8"))

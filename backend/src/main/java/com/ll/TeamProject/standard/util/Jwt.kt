@@ -1,42 +1,36 @@
-package com.ll.TeamProject.standard.util;
+package com.ll.TeamProject.standard.util
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
+import java.io.Serializable
+import java.util.*
+import javax.crypto.SecretKey
 
-import javax.crypto.SecretKey;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Map;
+object Jwt {
+    fun toString(secret: String, expireSeconds: Long, body: Map<String, out Serializable>): String {
+        val secretKey: SecretKey = Keys.hmacShaKeyFor(secret.toByteArray())
 
-public class Jwt {
-    public static String toString(String secret, long expireSeconds, Map<String, ? extends Serializable> body) {
-        SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        val issuedAt = Date()
+        val expiresAt = Date(issuedAt.time + expireSeconds * 1000)
 
-        Date issuedAt = new Date();
-        Date expiresAt = new Date(issuedAt.getTime() + expireSeconds * 1000);
-
-        String jwt = Jwts.builder()
-                .claims(body)
-                .issuedAt(issuedAt)
-                .expiration(expiresAt)
-                .signWith(secretKey)
-                .compact();
-
-        return jwt;
+        return Jwts.builder()
+            .claims(body)
+            .issuedAt(issuedAt)
+            .expiration(expiresAt)
+            .signWith(secretKey)
+            .compact()
     }
 
-    public static Map<String, Object> payload(String secret, String accessTokenStr) {
-        SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+    fun payload(secret: String, accessTokenStr: String): Map<String, Any>? {
+        val secretKey: SecretKey = Keys.hmacShaKeyFor(secret.toByteArray())
 
-        try{
-            return (Map<String, Object>) Jwts
-                    .parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parse(accessTokenStr)
-                    .getPayload();
-        } catch (Exception e) {
-            return null;
-        }
+        return runCatching {
+            Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parse(accessTokenStr)
+                .payload as Map<String, Any>
+        }.getOrNull()
     }
 }
+
