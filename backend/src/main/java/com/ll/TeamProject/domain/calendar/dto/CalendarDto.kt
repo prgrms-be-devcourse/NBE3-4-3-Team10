@@ -1,4 +1,6 @@
-package com.ll.TeamProject.domain.calendar.dto;
+package com.ll.TeamProject.domain.calendar.dto
 
-public record CalendarDto(String title, String description) {
-}
+data class CalendarDto(
+    val title: String,
+    val description: String
+)
