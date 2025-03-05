@@ -1,57 +1,66 @@
-package com.ll.TeamProject.domain.schedule.entity;
+package com.ll.TeamProject.domain.schedule.entity
 
-import com.ll.TeamProject.domain.calendar.entity.Calendar;
-import com.ll.TeamProject.domain.user.entity.SiteUser;
-import com.ll.TeamProject.global.jpa.entity.BaseTime;
-import com.ll.TeamProject.global.jpa.entity.Location;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonBackReference
+import com.ll.TeamProject.domain.calendar.entity.Calendar
+import com.ll.TeamProject.domain.user.entity.SiteUser
+import com.ll.TeamProject.global.jpa.entity.BaseTime
+import com.ll.TeamProject.global.jpa.entity.Location
+import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@NamedQueries({
-        @NamedQuery(
-                name = "Schedule.findOverlappingSchedules",
-                query = "SELECT s FROM Schedule s WHERE s.calendar.id = :calendarId AND (s.startTime < :endTime AND s.endTime > :startTime)"
-        ),
-        @NamedQuery(
-                name = "Schedule.findSchedulesByCalendarAndDateRange",
-                query = "SELECT s FROM Schedule s WHERE s.calendar.id = :calendarId AND (s.startTime < :endDate AND s.endTime > :startDate)"
-        )
-})
-public class Schedule extends BaseTime {
+@NamedQueries(
+    NamedQuery(
+        name = "Schedule.findOverlappingSchedules",
+        query = "SELECT s FROM Schedule s WHERE s.calendar.id = :calendarId AND (s.startTime < :endTime AND s.endTime > :startTime)"
+    ),
+    NamedQuery(
+        name = "Schedule.findSchedulesByCalendarAndDateRange",
+        query = "SELECT s FROM Schedule s WHERE s.calendar.id = :calendarId AND (s.startTime < :endDate AND s.endTime > :startDate)"
+    )
+)
+class Schedule(
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_id", nullable = false)
-    private Calendar calendar;
+    var calendar: Calendar,
 
     @Column(length = 200)
-    private String title;
+    var title: String,
 
     @Column(columnDefinition = "TEXT")
-    private String description;
+    var description: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private SiteUser user;
+    var user: SiteUser,
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private Location location;
+    var startTime: LocalDateTime,
+    var endTime: LocalDateTime,
+    var location: Location
+) : BaseTime() {
 
-    public void update(String title, String description,
-                       LocalDateTime startTime, LocalDateTime endTime, Location location) {
-        this.title = title;
-        this.description = description;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.location = location;
+    fun update(
+        title: String,
+        description: String,
+        startTime: LocalDateTime,
+        endTime: LocalDateTime,
+        location: Location
+    ) {
+        this.title = title
+        this.description = description
+        this.startTime = startTime
+        this.endTime = endTime
+        this.location = location
     }
+
+    constructor() : this(
+        calendar = Calendar(),
+        title = "",
+        description = "",
+        user = SiteUser(),
+        startTime = LocalDateTime.now(),
+        endTime = LocalDateTime.now(),
+        location = Location()
+    )
 }
