@@ -3,7 +3,6 @@ package com.ll.TeamProject.domain.schedule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.ll.TeamProject.domain.calendar.repository.CalendarRepository;
 import com.ll.TeamProject.domain.schedule.dto.ScheduleRequestDto;
 import com.ll.TeamProject.domain.schedule.entity.Schedule;
 import com.ll.TeamProject.domain.schedule.repository.ScheduleRepository;

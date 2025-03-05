@@ -2,7 +2,6 @@ package com.ll.TeamProject.domain.calendar;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.TeamProject.domain.calendar.dto.CalendarRequestDto;
-import com.ll.TeamProject.domain.calendar.repository.CalendarRepository;
 import com.ll.TeamProject.domain.user.TestUserHelper;
 import com.ll.TeamProject.domain.user.entity.SiteUser;
 import com.ll.TeamProject.domain.user.service.UserService;
