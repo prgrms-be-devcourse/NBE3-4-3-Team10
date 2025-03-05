@@ -1,192 +1,201 @@
-package com.ll.TeamProject.domain.schedule.service;
+package com.ll.TeamProject.domain.schedule.service
 
-import com.ll.TeamProject.domain.calendar.entity.Calendar;
-import com.ll.TeamProject.domain.calendar.repository.CalendarRepository;
-import com.ll.TeamProject.domain.schedule.dto.ScheduleRequestDto;
-import com.ll.TeamProject.domain.schedule.dto.ScheduleResponseDto;
-import com.ll.TeamProject.domain.schedule.entity.Schedule;
-import com.ll.TeamProject.domain.schedule.mapper.ScheduleMapper;
-import com.ll.TeamProject.domain.schedule.repository.ScheduleRepository;
-import com.ll.TeamProject.domain.user.entity.SiteUser;
-import com.ll.TeamProject.global.exceptions.ServiceException;
-import com.ll.TeamProject.global.userContext.UserContextService;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
+import com.ll.TeamProject.domain.calendar.entity.Calendar
+import com.ll.TeamProject.domain.calendar.repository.CalendarRepository
+import com.ll.TeamProject.domain.schedule.dto.ScheduleRequestDto
+import com.ll.TeamProject.domain.schedule.dto.ScheduleResponseDto
+import com.ll.TeamProject.domain.schedule.entity.Schedule
+import com.ll.TeamProject.domain.schedule.mapper.ScheduleMapper
+import com.ll.TeamProject.domain.schedule.repository.ScheduleRepository
+import com.ll.TeamProject.domain.user.entity.SiteUser
+import com.ll.TeamProject.global.exceptions.ServiceException
+import com.ll.TeamProject.global.userContext.UserContextService
+import jakarta.transaction.Transactional
+import org.springframework.stereotype.Service
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Service
-@RequiredArgsConstructor
 @Transactional
-public class ScheduleService {
-
-    private final ScheduleRepository scheduleRepository;
-    private final CalendarRepository calendarRepository;
-    private final ScheduleMapper scheduleMapper;
-    private final UserContextService userContextService;
-
+open class ScheduleService(
+    private val scheduleRepository: ScheduleRepository,
+    private val calendarRepository: CalendarRepository,
+    private val scheduleMapper: ScheduleMapper,
+    private val userContextService: UserContextService
+) {
     // 일정 생성
-    public ScheduleResponseDto createSchedule(Long calendarId, ScheduleRequestDto scheduleRequestDto) {
-        SiteUser user = userContextService.getAuthenticatedUser();
-        Calendar calendar = validateCalendarOwner(calendarId, user);
+    fun createSchedule(calendarId: Long, scheduleRequestDto: ScheduleRequestDto): ScheduleResponseDto {
+        val user = userContextService.authenticatedUser
+        val calendar = validateCalendarOwner(calendarId, user)
 
-        Schedule schedule = new Schedule(
-                calendar,
-                scheduleRequestDto.title(),
-                scheduleRequestDto.description(),
-                user,
-                scheduleRequestDto.startTime(),
-                scheduleRequestDto.endTime(),
-                scheduleRequestDto.location()
-        );
-        return scheduleMapper.toDto(scheduleRepository.save(schedule));
+        val schedule = Schedule(
+            calendar,
+            scheduleRequestDto.title,
+            scheduleRequestDto.description,
+            user,
+            scheduleRequestDto.startTime,
+            scheduleRequestDto.endTime,
+            scheduleRequestDto.location
+        )
+        return scheduleMapper.toDto(scheduleRepository.save(schedule))
     }
 
     // 일정 수정
-    public ScheduleResponseDto updateSchedule(Long calendarId, Long scheduleId, ScheduleRequestDto scheduleRequestDto) {
-        SiteUser user = userContextService.getAuthenticatedUser();
-        Schedule schedule = validateScheduleOwnership(calendarId, scheduleId, user, "수정");
+    fun updateSchedule(
+        calendarId: Long,
+        scheduleId: Long,
+        scheduleRequestDto: ScheduleRequestDto
+    ): ScheduleResponseDto {
+        val user = userContextService.authenticatedUser
+        val schedule = validateScheduleOwnership(calendarId, scheduleId, user, "수정")
 
         schedule.update(
-                scheduleRequestDto.title(),
-                scheduleRequestDto.description(),
-                scheduleRequestDto.startTime(),
-                scheduleRequestDto.endTime(),
-                scheduleRequestDto.location()
-        );
-        return scheduleMapper.toDto(schedule);
+            scheduleRequestDto.title,
+            scheduleRequestDto.description,
+            scheduleRequestDto.startTime,
+            scheduleRequestDto.endTime,
+            scheduleRequestDto.location
+        )
+        return scheduleMapper.toDto(schedule)
     }
 
     // 일정 삭제
-    public void deleteSchedule(Long calendarId, Long scheduleId) {
-        SiteUser user = userContextService.getAuthenticatedUser();
-        validateScheduleOwnership(calendarId, scheduleId, user, "삭제");
+    fun deleteSchedule(calendarId: Long, scheduleId: Long) {
+        val user = userContextService.authenticatedUser
+        validateScheduleOwnership(calendarId, scheduleId, user, "삭제")
 
-        scheduleRepository.deleteById(scheduleId);
+        scheduleRepository.deleteById(scheduleId)
     }
 
     // 일정 목록 조회
-    public List<ScheduleResponseDto> getSchedules(Long calendarId, LocalDate startDate, LocalDate endDate) {
-        SiteUser user = userContextService.getAuthenticatedUser();
-        validateCalendarOwner(calendarId, user);
+    fun getSchedules(calendarId: Long, startDate: LocalDate, endDate: LocalDate): List<ScheduleResponseDto> {
+        val user = userContextService.authenticatedUser
+        validateCalendarOwner(calendarId, user)
 
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        val startDateTime = startDate.atStartOfDay()
+        val endDateTime = endDate.atTime(LocalTime.MAX)
+
         return scheduleRepository.findSchedulesByCalendarAndDateRange(calendarId, startDateTime, endDateTime)
-                .stream().map(scheduleMapper::toDto).toList();
+            .map { scheduleMapper.toDto(it) }
     }
 
     // 하루 일정 조회
-    public List<ScheduleResponseDto> getDailySchedules(Long calendarId, LocalDate date) {
-        SiteUser user = userContextService.getAuthenticatedUser();
-        validateCalendarOwner(calendarId, user);
+    fun getDailySchedules(calendarId: Long, date: LocalDate): List<ScheduleResponseDto> {
+        val user = userContextService.authenticatedUser
+        validateCalendarOwner(calendarId, user)
 
-        LocalDateTime[] range = getDayRange(date);
-        return scheduleRepository.findSchedulesByCalendarAndDateRange(calendarId, range[0], range[1])
-                .stream().map(scheduleMapper::toDto).toList();
+        val (start, end) = getDayRange(date)
+
+        return scheduleRepository.findSchedulesByCalendarAndDateRange(calendarId, start, end)
+            .map { scheduleMapper.toDto(it) }
     }
 
     // 주별 일정 조회
-    public List<ScheduleResponseDto> getWeeklySchedules(Long calendarId, LocalDate date) {
-        SiteUser user = userContextService.getAuthenticatedUser();
-        validateCalendarOwner(calendarId, user);
+    fun getWeeklySchedules(calendarId: Long, date: LocalDate): List<ScheduleResponseDto> {
+        val user = userContextService.authenticatedUser
+        validateCalendarOwner(calendarId, user)
 
-        LocalDateTime[] range = getWeekRange(date);
-        return scheduleRepository.findSchedulesByCalendarAndDateRange(calendarId, range[0], range[1])
-                .stream().map(scheduleMapper::toDto).toList();
+        val (start, end) = getWeekRange(date)
+
+        return scheduleRepository.findSchedulesByCalendarAndDateRange(calendarId, start, end)
+            .map { scheduleMapper.toDto(it) }
     }
+
 
     // 월별 일정 조회
-    public List<ScheduleResponseDto> getMonthlySchedules(Long calendarId, LocalDate date) {
-        SiteUser user = userContextService.getAuthenticatedUser();
-        validateCalendarOwner(calendarId, user);
+    fun getMonthlySchedules(calendarId: Long, date: LocalDate): List<ScheduleResponseDto> {
+        val user = userContextService.authenticatedUser
+        validateCalendarOwner(calendarId, user)
 
-        LocalDateTime[] range = getMonthRange(date);
-        return scheduleRepository.findSchedulesByCalendarAndDateRange(calendarId, range[0], range[1])
-                .stream().map(scheduleMapper::toDto).toList();
+        val (start, end) = getMonthRange(date)
+
+        return scheduleRepository.findSchedulesByCalendarAndDateRange(calendarId, start, end)
+            .map { scheduleMapper.toDto(it) }
     }
 
+
     // 특정 일정 세부 조회
-    public ScheduleResponseDto getScheduleById(Long calendarId, Long scheduleId) {
-        SiteUser user = userContextService.getAuthenticatedUser();
-        validateCalendarOwner(calendarId, user);
+    fun getScheduleById(calendarId: Long, scheduleId: Long): ScheduleResponseDto {
+        val user = userContextService.authenticatedUser
+        validateCalendarOwner(calendarId, user)
 
-        Schedule schedule = getScheduleByIdOrThrow(scheduleId);
-        validateScheduleBelongsToCalendar(schedule, calendarId);
+        val schedule = getScheduleByIdOrThrow(scheduleId)
+        validateScheduleBelongsToCalendar(schedule, calendarId)
 
-        return scheduleMapper.toDto(schedule);
+        return scheduleMapper.toDto(schedule)
     }
 
 
     // --- 내부 헬퍼 메서드 ---
-
     // 캘린더 존재 및 소유자 검증
-    private Calendar validateCalendarOwner(Long calendarId, SiteUser user) {
-        Calendar calendar = getCalendarByIdOrThrow(calendarId);
-        checkCalendarOwnership(calendar, user);
-        return calendar;
+    private fun validateCalendarOwner(calendarId: Long, user: SiteUser): Calendar {
+        val calendar = getCalendarByIdOrThrow(calendarId)
+        checkCalendarOwnership(calendar, user)
+        return calendar
     }
 
     // 일정 존재 확인
-    private Schedule getScheduleByIdOrThrow(Long scheduleId) {
+    private fun getScheduleByIdOrThrow(scheduleId: Long): Schedule {
         return scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new ServiceException("404", "해당 일정을 찾을 수 없습니다."));
+            .orElseThrow { ServiceException("404", "해당 일정을 찾을 수 없습니다.") }!!
     }
 
     // 캘린더 존재 확인
-    private Calendar getCalendarByIdOrThrow(Long calendarId) {
+    private fun getCalendarByIdOrThrow(calendarId: Long): Calendar {
         return calendarRepository.findById(calendarId)
-                .orElseThrow(() -> new ServiceException("404", "해당 캘린더를 찾을 수 없습니다."));
+            .orElseThrow { ServiceException("404", "해당 캘린더를 찾을 수 없습니다.") }
     }
 
     // 캘린더 소유자 검증
-    private void checkCalendarOwnership(Calendar calendar, SiteUser user) {
-        if (!calendar.getUser().getId().equals(user.getId())) {
-            throw new ServiceException("403", "캘린더 소유자만 접근할 수 있습니다.");
+    private fun checkCalendarOwnership(calendar: Calendar, user: SiteUser) {
+        if (calendar.user.id != user.id) {
+            throw ServiceException("403", "캘린더 소유자만 접근할 수 있습니다.")
         }
     }
 
     // 일정이 해당 calendarId에 속하는지 검증하는 메서드
-    private void validateScheduleBelongsToCalendar(Schedule schedule, Long calendarId) {
-        if (!schedule.getCalendar().getId().equals(calendarId)) {
-            throw new ServiceException("400", "해당 일정은 요청한 캘린더에 속하지 않습니다.");
+    private fun validateScheduleBelongsToCalendar(schedule: Schedule, calendarId: Long) {
+        if (schedule.calendar.id != calendarId) {
+            throw ServiceException("400", "해당 일정은 요청한 캘린더에 속하지 않습니다.")
         }
     }
 
     // 일정 수정/삭제 시 캘린더 및 일정 소유자 검증
-    private Schedule validateScheduleOwnership(Long calendarId, Long scheduleId, SiteUser user, String action) {
-        validateCalendarOwner(calendarId, user);
-        Schedule schedule = getScheduleByIdOrThrow(scheduleId);
-        validateScheduleBelongsToCalendar(schedule, calendarId);
+    private fun validateScheduleOwnership(
+        calendarId: Long,
+        scheduleId: Long,
+        user: SiteUser,
+        action: String
+    ): Schedule {
+        validateCalendarOwner(calendarId, user)
+        val schedule = getScheduleByIdOrThrow(scheduleId)
+        validateScheduleBelongsToCalendar(schedule, calendarId)
 
-        if (!schedule.getUser().getId().equals(user.getId())) {
-            throw new ServiceException("403", "일정을 " + action + "할 권한이 없습니다.");
+        if (schedule.user.id != user.id) {
+            throw ServiceException("403", "일정을 " + action + "할 권한이 없습니다.")
         }
-        return schedule;
+        return schedule
     }
 
 
     // 하루 날짜 범위 계산
-    private LocalDateTime[] getDayRange(LocalDate date) {
-        return new LocalDateTime[]{date.atStartOfDay(), date.atTime(LocalTime.MAX)};
+    private fun getDayRange(date: LocalDate): Array<LocalDateTime> {
+        return arrayOf(date.atStartOfDay(), date.atTime(LocalTime.MAX))
     }
 
     // 주간 날짜 범위 계산
-    private LocalDateTime[] getWeekRange(LocalDate date) {
-        LocalDate startOfWeek = date.with(DayOfWeek.SUNDAY);
-        LocalDate endOfWeek = date.with(DayOfWeek.SATURDAY);
-        return new LocalDateTime[]{startOfWeek.atStartOfDay(), endOfWeek.atTime(LocalTime.MAX)};
+    private fun getWeekRange(date: LocalDate): Array<LocalDateTime> {
+        val startOfWeek = date.with(DayOfWeek.SUNDAY)
+        val endOfWeek = date.with(DayOfWeek.SATURDAY)
+        return arrayOf(startOfWeek.atStartOfDay(), endOfWeek.atTime(LocalTime.MAX))
     }
 
     // 월간 날짜 범위 계산
-    private LocalDateTime[] getMonthRange(LocalDate date) {
-        LocalDate firstDay = date.withDayOfMonth(1);
-        LocalDate lastDay = date.withDayOfMonth(date.lengthOfMonth());
-        return new LocalDateTime[]{firstDay.atStartOfDay(), lastDay.atTime(LocalTime.MAX)};
+    private fun getMonthRange(date: LocalDate): Array<LocalDateTime> {
+        val firstDay = date.withDayOfMonth(1)
+        val lastDay = date.withDayOfMonth(date.lengthOfMonth())
+        return arrayOf(firstDay.atStartOfDay(), lastDay.atTime(LocalTime.MAX))
     }
 }
