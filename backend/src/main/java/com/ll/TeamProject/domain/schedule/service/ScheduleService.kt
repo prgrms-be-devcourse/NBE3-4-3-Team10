@@ -27,7 +27,7 @@ open class ScheduleService(
 ) {
     // 일정 생성
     fun createSchedule(calendarId: Long, scheduleRequestDto: ScheduleRequestDto): ScheduleResponseDto {
-        val user = userContextService.authenticatedUser
+        val user = userContextService.getAuthenticatedUser()
         val calendar = validateCalendarOwner(calendarId, user)
 
         val schedule = Schedule(
@@ -48,7 +48,7 @@ open class ScheduleService(
         scheduleId: Long,
         scheduleRequestDto: ScheduleRequestDto
     ): ScheduleResponseDto {
-        val user = userContextService.authenticatedUser
+        val user = userContextService.getAuthenticatedUser()
         val schedule = validateScheduleOwnership(calendarId, scheduleId, user, "수정")
 
         schedule.update(
@@ -63,7 +63,7 @@ open class ScheduleService(
 
     // 일정 삭제
     fun deleteSchedule(calendarId: Long, scheduleId: Long) {
-        val user = userContextService.authenticatedUser
+        val user = userContextService.getAuthenticatedUser()
         validateScheduleOwnership(calendarId, scheduleId, user, "삭제")
 
         scheduleRepository.deleteById(scheduleId)
@@ -71,7 +71,7 @@ open class ScheduleService(
 
     // 일정 목록 조회
     fun getSchedules(calendarId: Long, startDate: LocalDate, endDate: LocalDate): List<ScheduleResponseDto> {
-        val user = userContextService.authenticatedUser
+        val user = userContextService.getAuthenticatedUser()
         validateCalendarOwner(calendarId, user)
 
         val startDateTime = startDate.atStartOfDay()
@@ -83,7 +83,7 @@ open class ScheduleService(
 
     // 하루 일정 조회
     fun getDailySchedules(calendarId: Long, date: LocalDate): List<ScheduleResponseDto> {
-        val user = userContextService.authenticatedUser
+        val user = userContextService.getAuthenticatedUser()
         validateCalendarOwner(calendarId, user)
 
         val (start, end) = getDayRange(date)
@@ -94,7 +94,7 @@ open class ScheduleService(
 
     // 주별 일정 조회
     fun getWeeklySchedules(calendarId: Long, date: LocalDate): List<ScheduleResponseDto> {
-        val user = userContextService.authenticatedUser
+        val user = userContextService.getAuthenticatedUser()
         validateCalendarOwner(calendarId, user)
 
         val (start, end) = getWeekRange(date)
@@ -106,7 +106,7 @@ open class ScheduleService(
 
     // 월별 일정 조회
     fun getMonthlySchedules(calendarId: Long, date: LocalDate): List<ScheduleResponseDto> {
-        val user = userContextService.authenticatedUser
+        val user = userContextService.getAuthenticatedUser()
         validateCalendarOwner(calendarId, user)
 
         val (start, end) = getMonthRange(date)
@@ -118,7 +118,7 @@ open class ScheduleService(
 
     // 특정 일정 세부 조회
     fun getScheduleById(calendarId: Long, scheduleId: Long): ScheduleResponseDto {
-        val user = userContextService.authenticatedUser
+        val user = userContextService.getAuthenticatedUser()
         validateCalendarOwner(calendarId, user)
 
         val schedule = getScheduleByIdOrThrow(scheduleId)
