@@ -1,17 +1,19 @@
-package com.ll.TeamProject.domain.calendar.repository;
+package com.ll.TeamProject.domain.calendar.repository
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import com.ll.TeamProject.domain.calendar.entity.Calendar  // Calendar 엔티티 수정
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
+import java.util.*
 
-import java.util.List;
-import java.util.Optional;
+interface CalendarRepository : JpaRepository<Calendar, Long> {
+    // 사용자 ID로 모든 캘린더 조회
+    fun findByUserId(userId: Long): List<Calendar>  // List<Calendar>로 반환 타입 수정
 
-public interface CalendarRepository extends JpaRepository<Calendar, Long> {
-    List<Calendar> findByUserId(Long userId);
-
+    // 특정 캘린더 ID로 해당 캘린더의 사용자 이름 조회
     @Query("SELECT c.user.username FROM Calendar c WHERE c.id = :calendarId")
-    String findUsernameByCalendarId(@Param("calendarId") Long calendarId);
+    fun findUsernameByCalendarId(@Param("calendarId") calendarId: Long): String
 
-    Optional<Calendar> findByName(String name);
+    // 이름으로 캘린더 조회
+    fun findByName(name: String): Optional<Calendar>
 }
