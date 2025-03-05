@@ -143,7 +143,7 @@ internal class UserServiceTest {
         val userToDelete = SiteUser("userToDelete")
         val actor = SiteUser("actor")
 
-        Mockito.`when`(userContext.actor)
+        Mockito.`when`(userContext.getActor())
             .thenReturn(actor)
 
         val exception = Assertions.assertThrows(CustomException::class.java) {

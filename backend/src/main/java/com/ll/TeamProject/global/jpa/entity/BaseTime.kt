@@ -14,10 +14,8 @@ abstract class BaseTime : BaseEntity() {
 
     @CreatedDate
     @Column(updatable = false)
-    final var createDate: LocalDateTime? = null
-        private set
+    lateinit var createDate: LocalDateTime
 
     @LastModifiedDate
-    final var modifyDate: LocalDateTime? = null
-        private set
+    lateinit var modifyDate: LocalDateTime
 }

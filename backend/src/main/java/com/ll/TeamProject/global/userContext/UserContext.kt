@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.context.annotation.RequestScope
 
+
 @RequestScope
 @Component
 class UserContext(
@@ -21,8 +22,9 @@ class UserContext(
 ) {
     // 요청을 보낸 사용자의 인증 정보를 가져와 실제 DB에 저장된 user 찾기
     fun findActor(): SiteUser? {
-        return (SecurityContextHolder.getContext().authentication?.principal as? SecurityUser)
-            ?.let { SiteUser(it.id, it.username) }
+        val actor = getActor() ?: return null
+
+        return userService.findById(actor.id!!).get()
     }
 
     // 요청을 보낸 사용자의 인증 정보를 가져와 해당 사용자를 조회
@@ -104,7 +106,7 @@ class UserContext(
     fun makeAuthCookies(user: SiteUser): String {
         val accessToken = userService.genAccessToken(user)
 
-        setCookie("apiKey", user.apiKey ?: "")
+        setCookie("apiKey", user.apiKey)
         setCookie("accessToken", accessToken)
 
         return accessToken
