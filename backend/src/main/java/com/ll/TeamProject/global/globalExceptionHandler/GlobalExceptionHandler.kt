@@ -10,7 +10,6 @@ import org.springframework.beans.TypeMismatchException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
@@ -61,13 +60,6 @@ class GlobalExceptionHandler {
     fun handleJsonParsingException(ex: HttpMessageNotReadableException): ResponseEntity<ErrorResponse> {
         log.error("HttpMessageNotReadableException: {}", ex.message)
         return ResponseEntity.badRequest().body(ErrorResponse("400-JSON_PARSE", "잘못된 JSON 형식입니다."))
-    }
-
-    // 403 - 권한 없음
-    @ExceptionHandler(AccessDeniedException::class)
-    fun handleAccessDeniedException(ex: AccessDeniedException): ResponseEntity<ErrorResponse> {
-        log.warn("AccessDeniedException: {}", ex.message)
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorResponse("403-FORBIDDEN", "권한이 없습니다."))
     }
 
     // 405 - 지원하지 않는 HTTP 메서드

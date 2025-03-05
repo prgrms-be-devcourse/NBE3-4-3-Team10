@@ -10,7 +10,6 @@ import org.mockito.InjectMocks
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.core.MethodParameter
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.web.HttpRequestMethodNotSupportedException
@@ -72,18 +71,6 @@ internal class GlobalExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("403 - 권한 없음 예외 처리 테스트")
-    fun accessDeniedException() {
-        val exception = AccessDeniedException("권한이 없습니다.")
-
-        val response = exceptionHandler.handleAccessDeniedException(exception)
-
-        Assertions.assertEquals(403, response.statusCode.value())
-        Assertions.assertEquals("403-FORBIDDEN", response.body!!.errorCode)
-        Assertions.assertEquals("권한이 없습니다.", response.body!!.msg)
-    }
-
-    @Test
     @DisplayName("405 - 지원하지 않는 HTTP 메서드 예외 처리 테스트")
     fun methodNotAllowed() {
         val exception = HttpRequestMethodNotSupportedException("PUT")
@@ -119,4 +106,3 @@ internal class GlobalExceptionHandlerTest {
         Assertions.assertEquals(UserErrorCode.INVALID_CREDENTIALS.message, response.body!!.msg)
     }
 }
-
