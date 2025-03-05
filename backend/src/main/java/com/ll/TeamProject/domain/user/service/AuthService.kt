@@ -7,20 +7,17 @@ import com.ll.TeamProject.domain.user.exceptions.UserErrorCode
 import com.ll.TeamProject.domain.user.repository.UserRepository
 import com.ll.TeamProject.global.exceptions.CustomException
 import com.ll.TeamProject.global.userContext.UserContext
-import lombok.RequiredArgsConstructor
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
-@RequiredArgsConstructor
 class AuthService(
     private val userRepository: UserRepository,
     private val authenticationService: AuthenticationService,
     private val userContext: UserContext,
     private val passwordEncoder: PasswordEncoder
 ) {
-
 
     fun login(username: String, password: String): LoginDto {
         val user = userRepository.findByUsername(username)

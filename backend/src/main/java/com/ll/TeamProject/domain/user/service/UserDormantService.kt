@@ -63,11 +63,11 @@ class UserDormantService(
         val nextMonthDate = nextMonth.atDay(1)
         val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일")
 
-        candidates.forEach(Consumer { candidate: DormantAccountProjection ->
+        candidates.forEach { candidate: DormantAccountProjection ->
             val message =
                 "장기 미사용 이용자로 ${candidate.nickname} 님 계정이 ${nextMonthDate.format(formatter)} 휴면계정으로 전환될 예정입니다."
             emailService.sendMail(candidate.email, "CanBeJ 휴면계정 전환 안내", message)
-        })
+        }
     }
 
     fun <T> processInBatches(ids: List<T>, batchSize: Int, processor: Consumer<List<T>>) {

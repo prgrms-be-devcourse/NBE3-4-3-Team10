@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service
 @Service
 class AuthTokenService {
     @Value("\${custom.jwt.secretKey}")
-    private val secretKey: String = ""
+    private lateinit var secretKey: String
 
     @Value("\${custom.accessToken.expirationSeconds}")
-    private val accessTokenExpirationSeconds: Long = 0
+    private var accessTokenExpirationSeconds: Long = 0
 
     fun genAccessToken(user: SiteUser): String {
         val id = user.id!!
@@ -23,7 +23,7 @@ class AuthTokenService {
         return Jwt.toString(
             secretKey,
             accessTokenExpirationSeconds,
-            java.util.Map.of("id", id, "username", username, "nickname", nickname, "role", role)
+            mapOf("id" to id, "username" to username, "nickname" to nickname, "role" to role)
         )
     }
 
@@ -32,11 +32,9 @@ class AuthTokenService {
 
         val id = (parsedPayload["id"] as Int).toLong()
         val username = parsedPayload["username"] as String
-        val role = Role.valueOf((parsedPayload["role"] as String))
+        val role = Role.valueOf(parsedPayload["role"] as String)
         val nickname = parsedPayload["nickname"] as String
 
-        return java.util.Map.of<String, Any>(
-            "id", id, "username", username, "role", role, "nickname", nickname)
-
+        return mapOf("id" to id, "username" to username, "role" to role, "nickname" to nickname)
     }
 }

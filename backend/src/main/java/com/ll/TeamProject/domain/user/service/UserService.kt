@@ -116,9 +116,7 @@ class UserService(
         return authTokenService.genAccessToken(user)
     }
 
-    fun genAuthToken(user: SiteUser): String {
-        return user.apiKey + " " + genAccessToken(user)
-    }
+    fun genAuthToken(user: SiteUser): String = "${user.apiKey} ${genAccessToken(user)}"
 
     // JWT 로 얻은 가짜 user 객체 (DB 에서 조회한 user 아님)
     fun getUserFromAccessToken(accessToken: String): SiteUser? {

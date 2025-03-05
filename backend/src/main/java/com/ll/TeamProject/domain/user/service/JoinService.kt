@@ -22,7 +22,7 @@ class JoinService(
     }
 
     fun join(username: String, password: String, email: String, providerTypeCode: String): SiteUser {
-        var user = SiteUser(
+        val user = SiteUser(
             username,
             password,
             username,
@@ -30,7 +30,7 @@ class JoinService(
             Role.USER,
             UUID.randomUUID().toString()
         )
-        user = userRepository.save(user)
+        userRepository.save(user)
 
         val authType = AuthType.valueOf(providerTypeCode)
         val authentication = create(

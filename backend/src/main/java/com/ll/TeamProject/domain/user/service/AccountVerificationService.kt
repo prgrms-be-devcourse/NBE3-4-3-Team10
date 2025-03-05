@@ -41,8 +41,7 @@ class AccountVerificationService(
     }
 
     private fun generateVerificationCode(): String {
-        val random = SecureRandom()
-        return String.format("%06d", random.nextInt(1000000))
+        return String.format("%06d", SecureRandom().nextInt(1000000))
     }
 
     private fun sendVerificationEmail(nickname: String, email: String, verificationCode: String) {
@@ -62,9 +61,7 @@ class AccountVerificationService(
                 username,
                 PASSWORD_RESET_EXPIRATION.toLong()
             )
-        } ?: run {
-            throw CustomException(UserErrorCode.VERIFICATION_CODE_EXPIRED)
-        }
+        } ?: throw CustomException(UserErrorCode.VERIFICATION_CODE_EXPIRED)
     }
 
     fun changePassword(username: String, password: String) {
