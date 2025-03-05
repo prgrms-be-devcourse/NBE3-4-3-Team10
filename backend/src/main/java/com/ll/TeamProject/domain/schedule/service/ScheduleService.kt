@@ -157,7 +157,9 @@ open class ScheduleService(
 
     // 일정이 해당 calendarId에 속하는지 검증하는 메서드
     private fun validateScheduleBelongsToCalendar(schedule: Schedule, calendarId: Long) {
-        if (schedule.calendar.id != calendarId) {
+        val calendar = requireNotNull(schedule.calendar) { "해당 일정에 연결된 캘린더가 없습니다." }
+
+        if (calendar.id != calendarId) {
             throw ServiceException("400", "해당 일정은 요청한 캘린더에 속하지 않습니다.")
         }
     }
@@ -173,11 +175,14 @@ open class ScheduleService(
         val schedule = getScheduleByIdOrThrow(scheduleId)
         validateScheduleBelongsToCalendar(schedule, calendarId)
 
-        if (schedule.user.id != user.id) {
-            throw ServiceException("403", "일정을 " + action + "할 권한이 없습니다.")
+        val scheduleOwner = requireNotNull(schedule.user) { "해당 일정의 소유자가 없습니다." }
+
+        if (scheduleOwner.id != user.id) {
+            throw ServiceException("403", "일정을 $action 할 권한이 없습니다.")
         }
         return schedule
     }
+
 
 
     // 하루 날짜 범위 계산
