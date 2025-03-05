@@ -2,6 +2,8 @@ package com.ll.TeamProject.domain.calendar.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.TeamProject.domain.calendar.dto.CalendarRequestDto;
+import com.ll.TeamProject.domain.calendar.entity.Calendar;
+import com.ll.TeamProject.domain.calendar.repository.CalendarRepository;
 import com.ll.TeamProject.domain.user.TestUserHelper;
 import com.ll.TeamProject.domain.user.entity.SiteUser;
 import com.ll.TeamProject.domain.user.service.UserService;
@@ -54,11 +56,11 @@ public class CalendarControllerTest {
         SiteUser testUser = userService.findByUsername(username).orElseThrow();
 
         // 테스트 캘린더 생성
-        Calendar testCalendar = Calendar.builder()
-                .name("테스트 캘린더")
-                .description("테스트 캘린더 설명")
-                .user(testUser)
-                .build();
+        Calendar testCalendar = new Calendar(
+                testUser,
+                "테스트 캘린더",
+                "테스트 캘린더 설명"
+        );
         calendarRepository.save(testCalendar);
         calendarId = testCalendar.getId();
     }
