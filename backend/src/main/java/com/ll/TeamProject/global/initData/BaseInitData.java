@@ -1,7 +1,5 @@
 package com.ll.TeamProject.global.initData;
 
-import com.ll.TeamProject.domain.calendar.entity.Calendar;
-import com.ll.TeamProject.domain.calendar.repository.CalendarRepository;
 import com.ll.TeamProject.domain.user.entity.Authentication;
 import com.ll.TeamProject.domain.user.entity.ForbiddenNickname;
 import com.ll.TeamProject.domain.user.entity.SiteUser;
