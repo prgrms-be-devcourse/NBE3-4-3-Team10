@@ -21,7 +21,7 @@ class Authentication(
 
     var isLocked: Boolean = false
 ) : BaseEntity() {
-    protected constructor() : this(SiteUser("", "", "", "", Role.USER), AuthType.LOCAL)
+    protected constructor() : this(SiteUser("", "", "", "", Role.USER, "", false, null, false), AuthType.LOCAL)
 
     fun updateLastLogin() {
         lastLogin = LocalDateTime.now()

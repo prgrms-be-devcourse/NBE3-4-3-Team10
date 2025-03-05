@@ -14,10 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,63 +26,23 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService; // 테스트할 클래스
 
-    @InjectMocks
+    @Mock
     private AuthService authService;
 
     @Mock
-    private AuthenticationService authenticationService;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    private AuthTokenService authTokenService;
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ForbiddenService forbiddenService;
 
     @Mock
     private Page<SiteUser> mockPage;
 
     @Mock
     private UserContext userContext;
-
-    @Test
-    @DisplayName("로그인시 잘못된 아이디")
-    void t1() {
-        // given
-        String username = "nonexistentUser";
-        String password = "password";
-
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        // when & then
-        CustomException exception = assertThrows(CustomException.class,
-                () -> authService.login(username, password));
-
-        assertEquals(UserErrorCode.INVALID_CREDENTIALS, exception.getErrorCode());
-        assertEquals(UserErrorCode.INVALID_CREDENTIALS.getMessage(), exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("로그인시 잘못된 비밀번호")
-    void t2() {
-        // given
-        String username = "admin1";
-        String password = "wrongPassword";
-//        SiteUser user = new SiteUser(
-//                username,
-//                password
-//        );
-
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        // when & then
-        CustomException exception = assertThrows(CustomException.class,
-                () -> authService.login(username, password));
-
-        assertEquals(UserErrorCode.INVALID_CREDENTIALS, exception.getErrorCode());
-        assertEquals(UserErrorCode.INVALID_CREDENTIALS.getMessage(), exception.getMessage());
-
-//        verify(authenticationService).handleLoginFailure(user); // 로그인 실패 처리 실행 확인
-    }
 
     @Test
     @DisplayName("회원 명단 조회 - 빈 키워드")

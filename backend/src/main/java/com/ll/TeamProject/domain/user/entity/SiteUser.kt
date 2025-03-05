@@ -30,7 +30,7 @@ class SiteUser(
     var role: Role,
 
     @Column(unique = true)
-    var apiKey: String? = null,
+    var apiKey: String,
 
     @Column
     var isDeleted: Boolean = false,
@@ -42,31 +42,19 @@ class SiteUser(
     var locked: Boolean = false
 ) : BaseTime() {
 
-    protected constructor() : this("", "", "", "", Role.USER) // JPA 기본 생성자
+    protected constructor() : this("", "", "", "", Role.USER, "", false, null, false) // JPA 기본 생성자
 
     // TODO: 생성자 리팩토링 필요
-    constructor(id: Long, username: String, nickname: String, role: Role) : this(username, nickname, "", "", role) {
+    constructor(id: Long, username: String, nickname: String, role: Role) : this() {
         this.id = id
-    }
-
-    constructor(id: Long, username: String, role: Role) : this(username, "", "", "", role) {
-        this.id = id
-    }
-
-    constructor(id: Long, username: String) : this(username, "", "", "", Role.USER) {
-        this.id = id
-    }
-
-    constructor(username: String, password: String) : this() {
         this.username = username
-        this.password = password
+        this.nickname = nickname
+        this.role = role
     }
 
-    constructor(username: String, password: String, email: String) : this() {
+    constructor(id: Long, username: String) : this() {
+        this.id = id
         this.username = username
-        this.password = password
-        this.email = email
-        this.role = Role.USER
     }
 
     constructor(username: String) : this() {
@@ -116,11 +104,6 @@ class SiteUser(
         changeNickname("탈퇴한 사용자_$username")
         this.isDeleted = true
         this.deletedDate = LocalDateTime.now()
-    }
-
-    fun lockAccountAndResetPassword(randomPassword: String) {
-        this.locked = true
-        this.password = randomPassword
     }
 
     fun lockAccount() {
