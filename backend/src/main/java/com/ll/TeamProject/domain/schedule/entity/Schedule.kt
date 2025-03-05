@@ -22,22 +22,28 @@ class Schedule(
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_id", nullable = false)
-    var calendar: Calendar,
+    var calendar: Calendar? = null,  // nullable로 변경하여 기본 생성자 허용
 
     @Column(length = 200)
-    var title: String,
+    var title: String = "",
 
     @Column(columnDefinition = "TEXT")
-    var description: String,
+    var description: String = "",
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    var user: SiteUser,
+    var user: SiteUser? = null,  // nullable로 변경
 
-    var startTime: LocalDateTime,
-    var endTime: LocalDateTime,
-    var location: Location
+    var startTime: LocalDateTime = LocalDateTime.now(),
+    var endTime: LocalDateTime = LocalDateTime.now(),
+
+    @Embedded
+    var location: Location? = null
+
 ) : BaseTime() {
+
+    // 기본 생성자 (JPA를 위한 필수 요소)
+    protected constructor() : this(null, "", "", null, LocalDateTime.now(), LocalDateTime.now(), null)
 
     fun update(
         title: String,
