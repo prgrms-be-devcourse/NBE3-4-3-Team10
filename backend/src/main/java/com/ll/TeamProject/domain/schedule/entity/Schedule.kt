@@ -3,6 +3,7 @@ package com.ll.TeamProject.domain.schedule.entity
 import com.fasterxml.jackson.annotation.JsonBackReference
 import com.ll.TeamProject.domain.calendar.entity.Calendar
 import com.ll.TeamProject.domain.user.entity.SiteUser
+import com.ll.TeamProject.global.jpa.entity.BaseTime
 import com.ll.TeamProject.global.jpa.entity.Location
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -22,28 +23,25 @@ class Schedule(
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_id", nullable = false)
-    var calendar: Calendar? = null,  // nullable로 변경하여 기본 생성자 허용
+    var calendar: Calendar,
 
     @Column(length = 200)
-    var title: String = "",
+    var title: String,
 
     @Column(columnDefinition = "TEXT")
-    var description: String = "",
+    var description: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    var user: SiteUser? = null,  // nullable로 변경
+    var user: SiteUser,
 
-    var startTime: LocalDateTime = LocalDateTime.now(),
-    var endTime: LocalDateTime = LocalDateTime.now(),
+    var startTime: LocalDateTime,
+
+    var endTime: LocalDateTime,
 
     @Embedded
-    var location: Location? = null
-
+    var location: Location
 ) : BaseTime() {
-
-    // 기본 생성자 (JPA를 위한 필수 요소)
-    protected constructor() : this(null, "", "", null, LocalDateTime.now(), LocalDateTime.now(), null)
 
     fun update(
         title: String,
@@ -59,13 +57,17 @@ class Schedule(
         this.location = location
     }
 
-    constructor() : this(
-        calendar = Calendar(),
-        title = "",
+    // 명시적 생성자 패턴
+    constructor(calendar: Calendar, user: SiteUser) : this(
+        calendar = calendar,
+        title = "Untitled Schedule",
         description = "",
-        user = SiteUser(),
+        user = user,
         startTime = LocalDateTime.now(),
-        endTime = LocalDateTime.now(),
+        endTime = LocalDateTime.now().plusHours(1),
         location = Location()
     )
+
+    // 기본 생성자
+    constructor() : this(Calendar(), SiteUser())
 }
