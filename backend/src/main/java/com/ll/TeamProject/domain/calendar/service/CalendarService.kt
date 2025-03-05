@@ -36,9 +36,10 @@ class CalendarService(
     }
 
     // 사용자의 모든 캘린더 조회
-    fun getAllCalendars(): List<Calendar> {  // List<Calendar>로 반환 타입 수정
+    fun getAllCalendars(): List<Calendar> {
         val user: SiteUser = userContextService.getAuthenticatedUser()
-        return calendarRepository.findByUserId(user.id)
+        val userId = user.id ?: throw IllegalStateException("User ID cannot be null") // 예외 처리 추가
+        return calendarRepository.findByUserId(userId)
     }
 
     // 특정 캘린더 조회 (소유자 검증 포함)
