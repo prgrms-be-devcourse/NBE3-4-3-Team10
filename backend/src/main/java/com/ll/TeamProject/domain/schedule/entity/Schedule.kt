@@ -3,7 +3,6 @@ package com.ll.TeamProject.domain.schedule.entity
 import com.fasterxml.jackson.annotation.JsonBackReference
 import com.ll.TeamProject.domain.calendar.entity.Calendar
 import com.ll.TeamProject.domain.user.entity.SiteUser
-import com.ll.TeamProject.global.jpa.entity.BaseTime
 import com.ll.TeamProject.global.jpa.entity.Location
 import jakarta.persistence.*
 import java.time.LocalDateTime
