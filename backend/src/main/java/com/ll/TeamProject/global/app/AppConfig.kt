@@ -1,26 +1,27 @@
-package com.ll.TeamProject.global.app;
+package com.ll.TeamProject.global.app
 
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Configuration
 
 @Configuration
-public class AppConfig {
+class AppConfig {
 
-    // 프론트엔드 URL 반환
-    public static String getSiteFrontUrl() {
-        return "http://localhost:3000";
+    companion object {
+        // 프론트엔드 URL 반환
+        fun getSiteFrontUrl(): String {
+            return "http://localhost:3000"
+        }
     }
 
-//    // CORS
+//    // CORS 설정 예제 (필요 시 활성화)
 //    @Bean
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
+//    fun corsConfigurer(): WebMvcConfigurer {
+//        return object : WebMvcConfigurer {
+//            override fun addCorsMappings(registry: CorsRegistry) {
 //                registry.addMapping("/**")
-//                        .allowedOrigins(getSiteFrontUrl()) // 기존 설정 활용
-//                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-//                        .allowCredentials(true);
+//                    .allowedOrigins(getSiteFrontUrl()) // 기존 설정 활용
+//                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                    .allowCredentials(true)
 //            }
-//        };
+//        }
 //    }
 }

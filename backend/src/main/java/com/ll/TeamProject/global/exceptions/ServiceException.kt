@@ -1,21 +1,9 @@
-package com.ll.TeamProject.global.exceptions;
+package com.ll.TeamProject.global.exceptions
 
-import com.ll.TeamProject.global.rsData.RsData;
-import com.ll.TeamProject.standard.base.Empty;
-import lombok.Getter;
+import com.ll.TeamProject.global.rsData.RsData
+import com.ll.TeamProject.standard.base.Empty
 
-@Getter
-public class ServiceException extends RuntimeException {
-    private final String resultCode;
-    private final String msg;
+class ServiceException(val resultCode: String, val msg: String) : RuntimeException("$resultCode : $msg") {
 
-    public ServiceException(String resultCode, String msg) {
-        super(resultCode + " : " + msg);
-        this.resultCode = resultCode;
-        this.msg = msg;
-    }
-
-    public RsData<Empty> getRsData() {
-        return new RsData<>(resultCode, msg);
-    }
+    val rsData: RsData<Empty> by lazy { RsData(resultCode, msg) }
 }

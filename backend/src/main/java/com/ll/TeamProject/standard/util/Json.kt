@@ -1,15 +1,13 @@
-package com.ll.TeamProject.standard.util;
+package com.ll.TeamProject.standard.util
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper
 
-public class Json {
-    private static final ObjectMapper om = new ObjectMapper();
+object Json {
+    private val objectMapper = ObjectMapper()
 
-    public static String toString(Object obj) {
-        try {
-            return om.writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException("JSON 직렬화 실패", e);
-        }
+    fun toString(obj: Any?): String = runCatching {
+        objectMapper.writeValueAsString(obj)
+    }.getOrElse { e ->
+        throw RuntimeException("JSON 직렬화 실패", e)
     }
 }

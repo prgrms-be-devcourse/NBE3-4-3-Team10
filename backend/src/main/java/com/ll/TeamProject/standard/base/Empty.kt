@@ -1,7 +1,6 @@
-package com.ll.TeamProject.standard.base;
+package com.ll.TeamProject.standard.base
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Empty {
-}
+object Empty
