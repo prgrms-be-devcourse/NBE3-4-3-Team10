@@ -1,5 +1,7 @@
 package com.ll.TeamProject.global.initData;
 
+import com.ll.TeamProject.domain.calendar.entity.Calendar;
+import com.ll.TeamProject.domain.calendar.repository.CalendarRepository;
 import com.ll.TeamProject.domain.user.entity.Authentication;
 import com.ll.TeamProject.domain.user.entity.ForbiddenNickname;
 import com.ll.TeamProject.domain.user.entity.SiteUser;
@@ -8,8 +10,6 @@ import com.ll.TeamProject.domain.user.repository.AuthenticationRepository;
 import com.ll.TeamProject.domain.user.repository.ForbiddenRepository;
 import com.ll.TeamProject.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,6 @@ import static com.ll.TeamProject.domain.user.enums.Role.ADMIN;
 import static com.ll.TeamProject.domain.user.enums.Role.USER;
 
 @Configuration
-@RequiredArgsConstructor
 public class BaseInitData {
 
     private final CalendarRepository calendarRepository;
@@ -34,10 +33,23 @@ public class BaseInitData {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationRepository authenticationRepository;
     private final ForbiddenRepository forbiddenRepository;
+    private final BaseInitData self;
 
-    @Autowired
-    @Lazy
-    private BaseInitData self;
+    public BaseInitData(
+            CalendarRepository calendarRepository,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            AuthenticationRepository authenticationRepository,
+            ForbiddenRepository forbiddenRepository,
+            @Lazy BaseInitData self
+    ) {
+        this.calendarRepository = calendarRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationRepository = authenticationRepository;
+        this.forbiddenRepository = forbiddenRepository;
+        this.self = self;
+    }
 
     @Bean
     public ApplicationRunner baseInitDataApplicationRunner() {

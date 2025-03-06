@@ -3,6 +3,7 @@ package com.ll.TeamProject.domain.schedule.entity
 import com.fasterxml.jackson.annotation.JsonBackReference
 import com.ll.TeamProject.domain.calendar.entity.Calendar
 import com.ll.TeamProject.domain.user.entity.SiteUser
+import com.ll.TeamProject.global.jpa.entity.BaseTime
 import com.ll.TeamProject.global.jpa.entity.Location
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -35,7 +36,10 @@ class Schedule(
     var user: SiteUser,
 
     var startTime: LocalDateTime,
+
     var endTime: LocalDateTime,
+
+    @Embedded
     var location: Location
 ) : BaseTime() {
 
@@ -53,13 +57,17 @@ class Schedule(
         this.location = location
     }
 
-    constructor() : this(
-        calendar = Calendar(),
-        title = "",
+    // 명시적 생성자 패턴
+    constructor(calendar: Calendar, user: SiteUser) : this(
+        calendar = calendar,
+        title = "Untitled Schedule",
         description = "",
-        user = SiteUser(),
+        user = user,
         startTime = LocalDateTime.now(),
-        endTime = LocalDateTime.now(),
+        endTime = LocalDateTime.now().plusHours(1),
         location = Location()
     )
+
+    // 기본 생성자
+    constructor() : this(Calendar(), SiteUser())
 }

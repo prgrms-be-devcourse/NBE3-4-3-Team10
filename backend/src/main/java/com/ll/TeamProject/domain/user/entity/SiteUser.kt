@@ -42,7 +42,7 @@ class SiteUser(
     var locked: Boolean = false
 ) : BaseTime() {
 
-    protected constructor() : this("", "", "", "", Role.USER, "", false, null, false) // JPA 기본 생성자
+    constructor() : this("", "", "", "", Role.USER, "", false, null, false) // JPA 기본 생성자
 
     // TODO: 생성자 리팩토링 필요
     constructor(id: Long, username: String, nickname: String, role: Role) : this() {

@@ -6,20 +6,15 @@ import com.ll.TeamProject.domain.schedule.entity.Schedule
 import com.ll.TeamProject.domain.user.entity.SiteUser
 import com.ll.TeamProject.global.jpa.entity.BaseTime
 import jakarta.persistence.*
-import lombok.AccessLevel
-import lombok.AllArgsConstructor
-import lombok.Getter
-import lombok.NoArgsConstructor
 
 @Entity
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 class Calendar(
-    @field:ManyToOne(fetch = FetchType.LAZY)
-    @field:JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     var user: SiteUser, // 사용자
+
     var name: String, // 캘린더 이름
+
     var description: String // 캘린더 설명
 ) : BaseTime() {
 
@@ -49,4 +44,8 @@ class Calendar(
         this.name = name
         this.description = description
     }
+
+    // 기본 생성자
+    constructor() : this(SiteUser(), "Default Name", "")
+
 }

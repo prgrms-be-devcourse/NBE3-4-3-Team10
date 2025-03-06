@@ -29,7 +29,7 @@ import java.time.format.DateTimeFormatter
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
-open class ScheduleControllerTest {
+class ScheduleControllerTest {
 
     @Autowired
     private lateinit var scheduleRepository: ScheduleRepository
@@ -124,7 +124,7 @@ open class ScheduleControllerTest {
             .andDo(print())
             .andExpect(status().isOk())
             .andReturn()
-            .getResponse()
+            .response
             .getContentAsString(StandardCharsets.UTF_8);
 
         return OBJECT_MAPPER.readTree(responseJson).get("id").asLong();
@@ -143,9 +143,9 @@ open class ScheduleControllerTest {
             .andExpect(jsonPath("$.description").value(dto.description))
             .andExpect(jsonPath("$.startTime").value(startTime))
             .andExpect(jsonPath("$.endTime").value(endTime))
-            .andExpect(jsonPath("$.location.latitude").value(dto.location!!.latitude))
-            .andExpect(jsonPath("$.location.longitude").value(dto.location!!.longitude))
-            .andExpect(jsonPath("$.location.address").value(dto.location!!.address))
+            .andExpect(jsonPath("$.location.latitude").value(dto.location.latitude))
+            .andExpect(jsonPath("$.location.longitude").value(dto.location.longitude))
+            .andExpect(jsonPath("$.location.address").value(dto.location.address))
     }
 
 
@@ -231,17 +231,17 @@ open class ScheduleControllerTest {
             .andExpect(jsonPath("$[0].description").value(meetingScheduleDto.description))
             .andExpect(jsonPath("$[0].startTime").value(formattedStartTime1))
             .andExpect(jsonPath("$[0].endTime").value(formattedEndTime1))
-            .andExpect(jsonPath("$[0].location.latitude").value(meetingScheduleDto.location!!.latitude))
-            .andExpect(jsonPath("$[0].location.longitude").value(meetingScheduleDto.location!!.longitude))
-            .andExpect(jsonPath("$[0].location.address").value(meetingScheduleDto.location!!.address))
+            .andExpect(jsonPath("$[0].location.latitude").value(meetingScheduleDto.location.latitude))
+            .andExpect(jsonPath("$[0].location.longitude").value(meetingScheduleDto.location.longitude))
+            .andExpect(jsonPath("$[0].location.address").value(meetingScheduleDto.location.address))
             // 두 번째 일정 검증 (운동 일정)
             .andExpect(jsonPath("$[1].title").value(workoutScheduleDto.title))
             .andExpect(jsonPath("$[1].description").value(workoutScheduleDto.description))
             .andExpect(jsonPath("$[1].startTime").value(formattedStartTime2))
             .andExpect(jsonPath("$[1].endTime").value(formattedEndTime2))
-            .andExpect(jsonPath("$[1].location.latitude").value(workoutScheduleDto.location!!.latitude))
-            .andExpect(jsonPath("$[1].location.longitude").value(workoutScheduleDto.location!!.longitude))
-            .andExpect(jsonPath("$[1].location.address").value(workoutScheduleDto.location!!.address))
+            .andExpect(jsonPath("$[1].location.latitude").value(workoutScheduleDto.location.latitude))
+            .andExpect(jsonPath("$[1].location.longitude").value(workoutScheduleDto.location.longitude))
+            .andExpect(jsonPath("$[1].location.address").value(workoutScheduleDto.location.address))
     }
 
 
@@ -281,9 +281,9 @@ open class ScheduleControllerTest {
             .andExpect(jsonPath("$.description").value(meetingScheduleDto.description))
             .andExpect(jsonPath("$.startTime").value(formattedStartTime1))
             .andExpect(jsonPath("$.endTime").value(formattedEndTime1))
-            .andExpect(jsonPath("$.location.latitude").value(meetingScheduleDto.location!!.latitude))
-            .andExpect(jsonPath("$.location.longitude").value(meetingScheduleDto.location!!.longitude))
-            .andExpect(jsonPath("$.location.address").value(meetingScheduleDto.location!!.address))
+            .andExpect(jsonPath("$.location.latitude").value(meetingScheduleDto.location.latitude))
+            .andExpect(jsonPath("$.location.longitude").value(meetingScheduleDto.location.longitude))
+            .andExpect(jsonPath("$.location.address").value(meetingScheduleDto.location.address))
     }
 
     @Test
