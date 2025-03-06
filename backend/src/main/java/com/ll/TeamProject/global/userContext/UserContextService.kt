@@ -9,6 +9,6 @@ class UserContextService(
     private val userContext: UserContext
 ) {
     fun getAuthenticatedUser(): SiteUser {
-        return userContext.findActor() ?: throw ServiceException("401", "로그인을 먼저 해주세요!")
+        return userContext.getActor() ?: throw ServiceException("401", "로그인을 먼저 해주세요!")
     }
 }
