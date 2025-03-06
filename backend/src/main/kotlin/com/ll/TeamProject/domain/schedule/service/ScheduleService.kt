@@ -2,6 +2,7 @@ package com.ll.TeamProject.domain.schedule.service
 
 import com.ll.TeamProject.domain.calendar.entity.Calendar
 import com.ll.TeamProject.domain.calendar.repository.CalendarRepository
+import com.ll.TeamProject.domain.calendar.service.CalendarOwnerValidator
 import com.ll.TeamProject.domain.schedule.dto.ScheduleRequestDto
 import com.ll.TeamProject.domain.schedule.dto.ScheduleResponseDto
 import com.ll.TeamProject.domain.schedule.entity.Schedule
@@ -23,6 +24,7 @@ open class ScheduleService(
     private val scheduleRepository: ScheduleRepository,
     private val calendarRepository: CalendarRepository,
     private val scheduleMapper: ScheduleMapper,
+    private val calendarOwnerValidator: CalendarOwnerValidator,
     private val userContextService: UserContextService
 ) {
     // 일정 생성
@@ -132,7 +134,7 @@ open class ScheduleService(
     // 캘린더 존재 및 소유자 검증
     private fun validateCalendarOwner(calendarId: Long, user: SiteUser): Calendar {
         val calendar = getCalendarByIdOrThrow(calendarId)
-        checkCalendarOwnership(calendar, user)
+        calendarOwnerValidator.validate(calendar, user)
         return calendar
     }
 
@@ -148,12 +150,7 @@ open class ScheduleService(
             .orElseThrow { ServiceException("404", "해당 캘린더를 찾을 수 없습니다.") }
     }
 
-    // 캘린더 소유자 검증
-    private fun checkCalendarOwnership(calendar: Calendar, user: SiteUser) {
-        if (calendar.user.id != user.id) {
-            throw ServiceException("403", "캘린더 소유자만 접근할 수 있습니다.")
-        }
-    }
+
 
     // 일정이 해당 calendarId에 속하는지 검증하는 메서드
     private fun validateScheduleBelongsToCalendar(schedule: Schedule, calendarId: Long) {
