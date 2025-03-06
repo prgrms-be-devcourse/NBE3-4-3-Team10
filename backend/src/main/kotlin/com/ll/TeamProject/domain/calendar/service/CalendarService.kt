@@ -5,6 +5,7 @@ import com.ll.TeamProject.domain.calendar.dto.CalendarUpdateDto
 import com.ll.TeamProject.domain.calendar.entity.Calendar
 import com.ll.TeamProject.domain.calendar.repository.CalendarRepository
 import com.ll.TeamProject.global.exceptions.ServiceException
+import com.ll.TeamProject.global.userContext.UserContext
 import com.ll.TeamProject.global.userContext.UserContextService
 import jakarta.transaction.Transactional
 import org.slf4j.Logger
@@ -16,7 +17,8 @@ import org.springframework.stereotype.Service
 class CalendarService(
     private val calendarRepository: CalendarRepository,
     private val userContextService: UserContextService,
-    private val calendarOwnerValidator: CalendarOwnerValidator
+    private val calendarOwnerValidator: CalendarOwnerValidator,
+    private val userContext: UserContext
 ) {
 
     private val log: Logger = LoggerFactory.getLogger(CalendarService::class.java)
@@ -27,7 +29,7 @@ class CalendarService(
 
     // 캘린더 생성
     fun createCalendar(dto: CalendarCreateDto): Calendar {
-        val user = userContextService.getAuthenticatedUser()
+        val user = userContext.findActor() ?: throw ServiceException("401", "인증된 사용자를 찾을 수 없습니다.")
         val calendar = Calendar(user, dto.name, dto.description)
         val savedCalendar = calendarRepository.save(calendar)
 
