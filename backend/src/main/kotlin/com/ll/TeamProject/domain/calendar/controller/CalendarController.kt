@@ -33,8 +33,11 @@ class CalendarController(
     @GetMapping("/{id}")
     fun getCalendarById(@PathVariable id: Long): ResponseEntity<CalendarResponseDto> {
         val calendar = calendarService.getCalendarById(id)
-            ?: throw CalendarNotFoundException("캘린더를 찾을 수 없습니다.")
-        return ResponseEntity.ok(CalendarResponseDto.from(calendar))
+        return if (calendar != null) {
+            ResponseEntity.ok(CalendarResponseDto.from(calendar))
+        } else {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)
+        }
     }
 
     @PutMapping("/{id}")
@@ -48,8 +51,4 @@ class CalendarController(
         calendarService.deleteCalendar(id)
         return ResponseEntity.ok("캘린더가 삭제되었습니다!")
     }
-}
-
-class CalendarNotFoundException(s: String) : Throwable() {
-
 }
