@@ -4,8 +4,10 @@ import com.ll.TeamProject.domain.user.dto.DormantAccountProjection
 import com.ll.TeamProject.domain.user.repository.AuthenticationRepository
 import com.ll.TeamProject.domain.user.repository.UserRepository
 import com.ll.TeamProject.global.mail.GoogleMailService
-import jakarta.transaction.Transactional
+import kotlinx.coroutines.*
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
@@ -19,9 +21,7 @@ class UserDormantService(
     private val emailService: GoogleMailService,
     private val userRepository: UserRepository
 ) {
-
-    @Transactional
-    fun processDormant() {
+    suspend fun processDormant() {
         // 기준 날짜 설정 (매월 1일 실행)
         val currentMonth = YearMonth.now()
 
@@ -29,17 +29,29 @@ class UserDormantService(
         val notifyCandidates = findCandidatesByMonthsAgo(11)
         sendDormantNotificationEmail(notifyCandidates, currentMonth.plusMonths(1))
 
-        // 2. 계정 잠금 (id 만 조회 후 한번에 100명씩 처리)
-        val lockIds = findUserIdsByMonthsAgo(12)
-        processInBatches(lockIds, 100) {
-            ids: List<Long> -> userRepository.bulkLockAccounts(ids)
-        }
+        withContext(Dispatchers.IO) {
+            // 2. 계정 잠금 (id 만 조회 후 한번에 100명씩 처리)
+            val lockIds = findUserIdsByMonthsAgo(12)
+            processInBatches(lockIds, 100) {
+                    ids: List<Long> -> lockAccountsInNewTransaction(ids)
+            }
 
-        // 3. 삭제 처리 (id 만 조회 후 한번에 100명씩 처리)
-        val deleteIds = findUserIdsByMonthsAgo(18)
-        processInBatches(deleteIds, 100) {
-            ids: List<Long> -> userRepository.bulkDeleteAccounts(ids, LocalDateTime.now())
+            // 3. 삭제 처리 (id 만 조회 후 한번에 100명씩 처리)
+            val deleteIds = findUserIdsByMonthsAgo(18)
+            processInBatches(deleteIds, 100) {
+                    ids: List<Long> -> deleteAccountsInNewTransaction(ids)
+            }
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun lockAccountsInNewTransaction(ids: List<Long>) {
+        userRepository.bulkLockAccounts(ids)
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun deleteAccountsInNewTransaction(ids: List<Long>) {
+        userRepository.bulkDeleteAccounts(ids, LocalDateTime.now())
     }
 
     fun findCandidatesByMonthsAgo(monthsAgo: Int): List<DormantAccountProjection> {
@@ -59,14 +71,21 @@ class UserDormantService(
         return arrayOf(startDate, endDate)
     }
 
-    private fun sendDormantNotificationEmail(candidates: List<DormantAccountProjection>, nextMonth: YearMonth) {
+    private suspend fun sendDormantNotificationEmail(candidates: List<DormantAccountProjection>, nextMonth: YearMonth) {
         val nextMonthDate = nextMonth.atDay(1)
         val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일")
 
-        candidates.forEach { candidate: DormantAccountProjection ->
-            val message =
-                "장기 미사용 이용자로 ${candidate.nickname} 님 계정이 ${nextMonthDate.format(formatter)} 휴면계정으로 전환될 예정입니다."
-            emailService.sendMail(candidate.email, "CanBeJ 휴면계정 전환 안내", message)
+        coroutineScope {
+            candidates.map { candidate ->
+                async {
+                    val message = """
+                        안녕하세요, ${candidate.nickname} 님.
+                        장기 미사용 이용자로 ${candidate.nickname} 님 계정이 ${nextMonthDate.format(formatter)} 휴면계정으로 전환될 예정입니다.
+                    """.trimIndent()
+
+                    emailService.sendMail(candidate.email, "CanBeJ 휴면계정 전환 안내", message)
+                }
+            }.awaitAll()
         }
     }
 
