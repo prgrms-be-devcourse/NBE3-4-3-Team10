@@ -1,28 +1,49 @@
 package com.ll.TeamProject.global.rsData;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.ll.TeamProject.standard.base.Empty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.springframework.lang.NonNull;
+import net.minidev.json.annotate.JsonIgnore;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@AllArgsConstructor
-@Getter
 public class RsData<T> {
-    @NonNull
     private final String resultCode;
-
-    @NonNull
     private final String msg;
-
-    @NonNull
     private final T data;
 
     public RsData(String resultCode, String msg) {
-        this(resultCode, msg, (T) new Empty());
+        this.resultCode = resultCode;
+        this.msg = msg;
+        this.data = null;
     }
+
+    public RsData(String resultCode, String msg, T data) {
+        this.resultCode = resultCode;
+        this.msg = msg;
+        this.data = data;
+    }
+
+    public static <T> RsData<T> of(String resultCode, String msg, T data) {
+        return new RsData<>(resultCode, msg, data);
+    }
+
+    public static RsData<Empty> okWithoutData(String msg) {
+        return new RsData<>("S-1", msg, new Empty());
+    }
+
+    public static RsData<Empty> failWithoutData(String msg) {
+        return new RsData<>("F-1", msg, new Empty());
+    }
+
+    public String getResultCode() {
+        return resultCode;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public static class Empty {}
 
     @JsonIgnore
     public int getStatusCode() {

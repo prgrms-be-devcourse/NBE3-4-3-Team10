@@ -6,7 +6,7 @@ plugins {
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
 	kotlin("plugin.jpa") version "1.9.25"
-
+	kotlin("kapt") version "1.9.0"
 }
 
 group = "com.ll"
@@ -17,6 +17,11 @@ java {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
+
+kapt {
+	correctErrorTypes = true
+}
+
 
 configurations {
 	compileOnly {
@@ -73,8 +78,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
 	//  객체 변환 (DTO ↔ Entity 변환)
-	implementation("org.mapstruct:mapstruct:1.6.3")
-	annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+	implementation("org.mapstruct:mapstruct:1.5.5.Final")
+	kapt("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
 
 	//  Kotlin 지원
