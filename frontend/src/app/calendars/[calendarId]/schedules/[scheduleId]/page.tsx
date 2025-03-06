@@ -48,7 +48,7 @@ export default function ScheduleDetailPage() {
     }
 
     if (!schedule) {
-        return <div className="text-center mt-20 text-xl font-bold">Loading...</div>;
+        return <div className="text-center mt-20 text-xl font-bold">잘못된 접근입니다.</div>;
     }
 
     return (
