@@ -33,5 +33,6 @@ jobs:
 
       - name: Build and run tests
         run: |
+          cd backend
           ./gradlew build --no-daemon
           ./gradlew test
