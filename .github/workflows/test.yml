@@ -22,7 +22,7 @@ jobs:
 
       - name: Create application-secret.yml from GitHub Secrets
         run: |
-          envsubst < src/main/resources/application-template.yml > src/main/resources/application-secret.yml
+          envsubst < backend/src/main/resources/application-template.yml > backend/src/main/resources/application-secret.yml
         env:
           KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
