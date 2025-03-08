@@ -4,6 +4,7 @@ import com.ll.TeamProject.domain.friend.entity.Friendship
 import com.ll.TeamProject.domain.friend.repository.FriendshipRepository
 import com.ll.TeamProject.domain.user.entity.SiteUser
 import com.ll.TeamProject.domain.user.repository.UserRepository
+import com.ll.TeamProject.global.exceptions.ServiceException
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
@@ -18,7 +19,7 @@ class FriendshipService(
         val user2 = userRepository.findById(userId2).orElseThrow { IllegalArgumentException("User not found") }
 
         if (friendshipRepository.existsByUser1AndUser2(user1, user2)) {
-            throw IllegalStateException("Users are already friends")
+            throw ServiceException("400","Users are already friends")
         }
 
         val friendship = Friendship.create(user1, user2)
