@@ -22,6 +22,7 @@ data class Friendship(
     val user2: SiteUser
 ) {
     companion object {
+        //중복된 userA, userB 들어가는거 방지
         fun create(userA: SiteUser, userB: SiteUser): Friendship {
             return if (requireNotNull(userA.id) < requireNotNull(userB.id)) {
                 Friendship(user1 = userA, user2 = userB)
