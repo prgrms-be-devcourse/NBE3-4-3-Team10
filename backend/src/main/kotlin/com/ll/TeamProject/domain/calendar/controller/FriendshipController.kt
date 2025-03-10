@@ -1,7 +1,7 @@
 package com.ll.TeamProject.domain.friend.controller
 
+import com.ll.TeamProject.domain.friend.dto.FriendResponseDto
 import com.ll.TeamProject.domain.friend.service.FriendshipService
-import com.ll.TeamProject.domain.user.entity.SiteUser
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -19,9 +19,10 @@ class FriendshipController(
     }
 
     @GetMapping("/{userId}")
-    fun getFriends(@PathVariable userId: Long): ResponseEntity<List<SiteUser>> {
+    fun getFriends(@PathVariable userId: Long): ResponseEntity<List<FriendResponseDto>> {
         val friends = friendshipService.getFriends(userId)
-        return ResponseEntity.ok(friends)
+        val response = friends.map { FriendResponseDto.from(it) }
+        return ResponseEntity.ok(response)
     }
 
     @DeleteMapping("/remove")
