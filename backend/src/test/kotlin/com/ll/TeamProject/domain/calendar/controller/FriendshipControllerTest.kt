@@ -58,7 +58,7 @@ class FriendshipControllerTest {
 
   resultActions
    .andExpect(status().isOk)
-   .andExpect(content().string("Friendship added successfully!"))
+   .andExpect(content().string(" 친구가 추가됬어요! "))
 
   val friends = friendshipService.getFriends(user1.id!!)
   assertThat(friends).contains(user2)
@@ -79,7 +79,7 @@ class FriendshipControllerTest {
   resultActions
    .andExpect(status().isBadRequest)
    .andExpect(jsonPath("$.resultCode").value("400"))
-   .andExpect(jsonPath("$.msg").value("Users are already friends"))
+   .andExpect(jsonPath("$.msg").value("이미 등록된 친구입니다!"))
  }
 
  @Test
@@ -111,7 +111,7 @@ class FriendshipControllerTest {
 
   resultActions
    .andExpect(status().isOk)
-   .andExpect(content().string("Friendship removed successfully!"))
+   .andExpect(content().string(" 친구가 삭제됬어요! "))
 
   val friends = friendshipService.getFriends(user1.id!!)
   assertThat(friends).doesNotContain(user2)
