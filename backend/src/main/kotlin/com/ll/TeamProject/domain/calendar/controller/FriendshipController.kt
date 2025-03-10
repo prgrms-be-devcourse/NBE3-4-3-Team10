@@ -15,7 +15,7 @@ class FriendshipController(
     @PostMapping("/add")
     fun addFriend(@RequestParam userId1: Long, @RequestParam userId2: Long): ResponseEntity<String> {
         friendshipService.addFriend(userId1, userId2)
-        return ResponseEntity.ok("Friendship added successfully!")
+        return ResponseEntity.ok("친구가 추가됬어요!")
     }
 
     @GetMapping("/{userId}")
@@ -28,6 +28,6 @@ class FriendshipController(
     @DeleteMapping("/remove")
     fun removeFriend(@RequestParam userId1: Long, @RequestParam userId2: Long): ResponseEntity<String> {
         friendshipService.removeFriend(userId1, userId2)
-        return ResponseEntity.ok("Friendship removed successfully!")
+        return ResponseEntity.ok("친구가 삭제됬어요!")
     }
 }
