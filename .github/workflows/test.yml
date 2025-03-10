@@ -1,0 +1,41 @@
+name: Run Tests Before Merging
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Create application-secret.yml from GitHub Secrets
+        run: |
+          envsubst < backend/src/main/resources/application-template.yml > backend/src/main/resources/application-secret.yml
+        env:
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x backend/gradlew
+      
+      - name: Build and run tests
+        run: |
+          cd backend
+          ./gradlew build --no-daemon
+          ./gradlew test
