@@ -2,7 +2,7 @@ package com.ll.TeamProject.domain.chat.websocket.controller
 
 import com.ll.TeamProject.domain.chat.websocket.service.WsTokenService
 import com.ll.TeamProject.domain.user.service.UserService
-import com.ll.TeamProject.global.userContext.UserContext
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -12,24 +12,30 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/ws-token")
 class WebSocketTokenController(
     private val userService: UserService,
-    private val wsTokenService: WsTokenService,
-    private val userContext: UserContext
+    private val wsTokenService: WsTokenService
 ) {
 
     @PostMapping
-    fun generateWsToken(): ResponseEntity<Map<String, String>> {
-        // 1. 쿠키에서 accessToken 가져오기
-        val accessToken = userContext.getCookieValue("accessToken")
-            ?: return ResponseEntity.status(401).body(mapOf("error" to "UNAUTHORIZED"))
+    fun generateWsToken(request: HttpServletRequest): ResponseEntity<Map<String, String>> {
+        val cookies = request.getHeader("Cookie")
 
-        // 2. accessToken 검증 및 사용자 조회
+        println("🕵️‍♂️ [DEBUG] Raw Cookie Header: $cookies")
+
+        val accessToken = cookies?.split("; ")
+            ?.find { it.startsWith("accessToken=") }
+            ?.substringAfter("=")
+
+        if (accessToken == null) {
+            return ResponseEntity.status(401).body(mapOf("error" to "UNAUTHORIZED"))
+        }
+
         val user = userService.getUserFromAccessToken(accessToken)
             ?: return ResponseEntity.status(401).body(mapOf("error" to "INVALID_TOKEN"))
 
-        // 3. wsToken 발급
         val wsToken = wsTokenService.createWsTokenForUser(user)
 
-        // 4. 클라이언트에 wsToken 반환
+        println("✅ [DEBUG] Generated wsToken: $wsToken")
+
         return ResponseEntity.ok(mapOf("wsToken" to wsToken))
     }
 }
