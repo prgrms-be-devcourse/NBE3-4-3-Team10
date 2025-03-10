@@ -88,7 +88,6 @@ dependencies {
 
 	// Kotlin Coroutines
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") // 코루틴 기본
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-spring:1.7.3") // Spring과 코루틴 연동
 	implementation("org.springframework:spring-tx") // TransactionTemplate
 }
 
