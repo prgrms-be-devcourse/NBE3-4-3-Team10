@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/ws-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 내정보 수정 */
+        post: operations["generateWsToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    }
     "/api/calendars/{id}": {
         parameters: {
             query?: never;

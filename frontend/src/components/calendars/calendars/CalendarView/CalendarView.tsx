@@ -9,7 +9,7 @@ import { scheduleApi } from "@/lib/schedule/api/scheduleApi";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import './CalendarView.css';
-import {PlusIcon} from "@heroicons/react/24/outline";
+import { PlusIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 
 interface CalendarViewProps {
     calendars: Calendar[];
@@ -76,8 +76,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     return (
         <div className="w-full h-full bg-white relative">
             <div className="h-full p-4">
-                <div className="flex">
-                    <div className="flex-grow"></div>
+                {/* 상단 버튼 영역 */}
+                <div className="flex gap-2 justify-end">
+                    {/* 일정 추가 버튼 */}
                     <button
                         onClick={() => {
                             if (selectedCalendar) {
@@ -91,7 +92,24 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         <PlusIcon className="w-5 h-5"/>
                         <span className="text-sm font-semibold tracking-wide">NEW SCHEDULE</span>
                     </button>
+
+                    {/* 채팅방 이동 버튼 추가 */}
+                    <button
+                        onClick={() => {
+                            if (selectedCalendar) {
+                                router.push(`/calendars/${selectedCalendar.id}/chat`);
+                            } else {
+                                console.error("📛 선택된 캘린더가 없습니다.");
+                            }
+                        }}
+                        className="flex items-center gap-2 bg-white text-gray-700 py-3 px-3 transition-all hover:bg-[#f6fafe] hover:shadow-[0_1px_3px_0_rgba(60,64,67,0.302)]"
+                    >
+                        <ChatBubbleLeftRightIcon className="w-5 h-5"/>
+                        <span className="text-sm font-semibold tracking-wide">OPEN CHAT</span>
+                    </button>
                 </div>
+
+                {/* FullCalendar 렌더링 영역 */}
                 <FullCalendar
                     plugins={[dayGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
@@ -138,7 +156,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     }}
                 />
             </div>
-
         </div>
     );
 };

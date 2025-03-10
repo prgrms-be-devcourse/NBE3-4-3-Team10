@@ -63,7 +63,7 @@ class UserService(
             throw CustomException(UserErrorCode.FORBIDDEN_NICKNAME)
         }
 
-        val actor = userContext.findActor()!! // ⚠️ actor가 `null`이면 런타임 오류 발생 (위험)
+        val actor = userContext.findActor()!!
 
         try {
             actor.changeNickname(nickname)
@@ -72,7 +72,6 @@ class UserService(
             throw CustomException(UserErrorCode.DUPLICATE_NICKNAME)
         }
 
-        // 수정된 닉네임 바로 적용되도록 쿠키 수정
         userContext.makeAuthCookies(actor)
     }
 
@@ -88,7 +87,6 @@ class UserService(
         userToDelete.delete()
         userRepository.save(userToDelete)
 
-        // TODO: 로그아웃 추가 수정 필요
         userContext.deleteCookie("accessToken")
         userContext.deleteCookie("apiKey")
         userContext.deleteCookie("JSESSIONID")
@@ -118,15 +116,19 @@ class UserService(
 
     fun genAuthToken(user: SiteUser): String = "${user.apiKey} ${genAccessToken(user)}"
 
-    // JWT 로 얻은 가짜 user 객체 (DB 에서 조회한 user 아님)
+    // accessToken의 유효성 검사 (payload 확인 + 실제 유저 존재 확인)
+    fun validateAccessToken(accessToken: String): Boolean {
+        val payload = authTokenService.payload(accessToken) ?: return false
+        val userId = (payload["id"] as? Number)?.toLong() ?: return false
+
+        return userRepository.findById(userId).isPresent
+    }
+
+    // accessToken으로 실제 DB에서 유저 조회
     fun getUserFromAccessToken(accessToken: String): SiteUser? {
         val payload = authTokenService.payload(accessToken) ?: return null
+        val userId = (payload["id"] as? Number)?.toLong() ?: return null
 
-        val id = payload["id"] as Long
-        val username = payload["username"] as String
-        val nickname = payload["nickname"] as String
-        val role = payload["role"] as Role
-
-        return SiteUser(id, username, nickname, role)
+        return userRepository.findById(userId).orElse(null)
     }
 }
