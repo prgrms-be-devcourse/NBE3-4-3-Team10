@@ -28,6 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.474.0",
     "next": "^15.1.6",
     "openapi-fetch": "^0.13.4",
@@ -42,7 +43,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/navermaps": "^3.7.8",
+    "@types/js-cookie": "^3.0.6",
+    "@types/navermaps": "^3.7.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
