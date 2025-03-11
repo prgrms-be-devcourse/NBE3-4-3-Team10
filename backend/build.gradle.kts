@@ -85,6 +85,10 @@ dependencies {
 	//  Kotlin 지원
 	implementation(kotlin("stdlib-jdk8"))
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+	// Kotlin Coroutines
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") // 코루틴 기본
+	implementation("org.springframework:spring-tx") // TransactionTemplate
 }
 
 tasks.withType<Test> {
