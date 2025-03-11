@@ -45,26 +45,39 @@ class ChatHandler(
             val chatMessageDto = objectMapper.readValue(message.payload, ChatMessageDto::class.java)
 
             val sender = chatSessionManager.getUser(session)
-            if (sender == null) {
-                log.error("❌ [메시지 처리 실패] 세션에 사용자 정보가 없습니다. WebSocket 인증 문제 발생 가능.")
+            if (sender == null || sender.id == null || sender.id != chatMessageDto.senderId) {
+                log.error("❌ [메시지 처리 실패] 세션 사용자와 senderId 불일치 또는 세션에 사용자 없음.")
                 return
             }
 
             val calendar = calendarRepository.findById(chatMessageDto.calendarId)
-                .orElseThrow { IllegalArgumentException("해당 캘린더가 존재하지 않습니다: ${chatMessageDto.calendarId}") }
+                .orElseThrow { IllegalArgumentException("캘린더가 존재하지 않습니다: ${chatMessageDto.calendarId}") }
 
-            // 메시지 저장
-            chatService.saveMessage(sender, calendar, chatMessageDto)
+            val savedMessage = chatService.saveMessage(
+                sender = sender,
+                calendar = calendar,
+                messageContent = chatMessageDto.message,
+                sentAt = chatMessageDto.sentAt
+            )
 
-            // 메시지 브로드캐스트
-            chatSessionManager.broadcastMessage(chatMessageDto.calendarId, message)
+            val responseDto = ChatMessageDto(
+                senderId = sender.id!!,
+                calendarId = calendar.id!!,
+                message = savedMessage.message,
+                sentAt = savedMessage.sentAt
+            )
 
-            log.info("📩 [메시지 전송 완료] calendarId=${chatMessageDto.calendarId}, sender=${sender.username}, message=${chatMessageDto.message}")
+            val responseText = objectMapper.writeValueAsString(responseDto)
+            chatSessionManager.broadcastMessage(calendar.id!!, TextMessage(responseText))
+
+            log.info("📩 [메시지 전송 완료] calendarId=${calendar.id}, sender=${sender.username}, message=${savedMessage.message}")
 
         } catch (e: Exception) {
             log.error("📛 [메시지 처리 중 오류 발생] ${e.message}")
         }
     }
+
+
 
     override fun afterConnectionClosed(session: WebSocketSession, status: org.springframework.web.socket.CloseStatus) {
         val calendarId = extractCalendarId(session)

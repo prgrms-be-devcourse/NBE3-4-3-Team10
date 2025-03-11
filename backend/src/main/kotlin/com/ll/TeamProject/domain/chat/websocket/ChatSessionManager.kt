@@ -29,10 +29,15 @@ class ChatSessionManager {
     }
 
     fun broadcastMessage(calendarId: Long, message: TextMessage) {
+        log.info("📡 [브로드캐스트] calendarId=$calendarId, 메시지=${message.payload}")
+
         sessionsByCalendar[calendarId]?.forEach { session ->
-            if (session.isOpen) session.sendMessage(message)
+            if (session.isOpen) {
+                session.sendMessage(message)
+            }
         }
     }
+
 
     fun getUser(session: WebSocketSession): SiteUser? {
         return userSessionMap[session]
