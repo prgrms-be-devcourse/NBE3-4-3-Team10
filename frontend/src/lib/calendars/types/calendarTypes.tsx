@@ -6,6 +6,7 @@ export interface Calendar {
   description: string;
   createdDate?: string;
   modifiedDate?: string;
+  sharedWith?: string[];
 }
 
 export interface CalendarCreateDto {
