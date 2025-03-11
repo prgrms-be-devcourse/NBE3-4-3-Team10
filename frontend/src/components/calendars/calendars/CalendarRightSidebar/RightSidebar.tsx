@@ -76,6 +76,7 @@ export const RightSidebar: React.FC = () => {
             await addFriend(userId, friendId);
             alert("✅ 친구 추가 성공!");
             setFriendUsername("");
+            window.location.reload();
         } catch (error) {
             alert("❌ 친구 추가에 실패했습니다!");
         }
@@ -138,6 +139,7 @@ export const RightSidebar: React.FC = () => {
                                                         try {
                                                             await removeFriend(userId, friend.id);
                                                             alert("✅ 친구 삭제 성공!");
+                                                            window.location.reload();
                                                         } catch (error) {
                                                             console.error("📛 친구 삭제 중 오류 발생:", error);
                                                             alert("❌ 친구 삭제에 실패했습니다!");
