@@ -9,50 +9,74 @@ import { scheduleApi } from "@/lib/schedule/api/scheduleApi";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import './CalendarView.css';
-import {PlusIcon} from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 interface CalendarViewProps {
-    calendars: Calendar[];
     selectedCalendar: Calendar | null;
-    onCalendarSelect: (calendar: Calendar) => void;
+    sharedCalendars: Calendar[]; // ✅ 공유된 캘린더 목록 추가
 }
 
-export const CalendarView: React.FC<CalendarViewProps> = ({
-                                                              selectedCalendar,
-                                                          }) => {
+export const CalendarView: React.FC<CalendarViewProps> = ({ selectedCalendar, sharedCalendars = [] }) => {
     const [events, setEvents] = useState<any[]>([]);
     const router = useRouter();
 
     useEffect(() => {
-        if (!selectedCalendar) return;
+        if (!selectedCalendar && sharedCalendars?.length === 0) return;
 
         const fetchSchedules = async () => {
             try {
                 const today = dayjs().format("YYYY-MM-DD");
-                const fetchedSchedules = await scheduleApi.getMonthlySchedules(
-                    selectedCalendar.id,
-                    today
-                );
+                let allEvents: any[] = [];
 
-                const formattedEvents = fetchedSchedules.map(schedule => ({
-                    id: String(schedule.id),
-                    title: schedule.title,
-                    start: schedule.startTime,
-                    end: schedule.endTime,
-                    description: schedule.description,
-                    allDay: false,
-                }));
+                // ✅ 내 캘린더 일정 가져오기
+                if (selectedCalendar) {
+                    const fetchedSchedules = await scheduleApi.getMonthlySchedules(
+                        selectedCalendar.id,
+                        today
+                    );
+                    const formattedEvents = fetchedSchedules.map(schedule => ({
+                        id: String(schedule.id),
+                        title: schedule.title,
+                        start: schedule.startTime,
+                        end: schedule.endTime,
+                        description: schedule.description,
+                        allDay: false,
+                        calendarName: selectedCalendar.name,
+                        isShared: false, // 🔵 내 캘린더 일정
+                    }));
+                    allEvents = [...allEvents, ...formattedEvents];
+                }
 
-                formattedEvents.sort((a, b) => dayjs(b.start).valueOf() - dayjs(a.start).valueOf());
+                // ✅ 공유된 캘린더 일정 가져오기
+                for (const calendar of sharedCalendars) {
+                    const fetchedSchedules = await scheduleApi.getMonthlySchedules(
+                        calendar.id,
+                        today
+                    );
+                    const formattedSharedEvents = fetchedSchedules.map(schedule => ({
+                        id: String(schedule.id),
+                        title: schedule.title,
+                        start: schedule.startTime,
+                        end: schedule.endTime,
+                        description: schedule.description,
+                        allDay: false,
+                        calendarName: calendar.name,
+                        isShared: true, // 🟢 공유된 캘린더 일정
+                    }));
+                    allEvents = [...allEvents, ...formattedSharedEvents];
+                }
 
-                setEvents(formattedEvents);
+                // ✅ 일정 정렬
+                allEvents.sort((a, b) => dayjs(b.start).valueOf() - dayjs(a.start).valueOf());
+
+                setEvents(allEvents);
             } catch (error) {
                 console.error("📛 일정 불러오기 실패:", error);
             }
         };
 
         fetchSchedules();
-    }, [selectedCalendar]);
+    }, [selectedCalendar, sharedCalendars]);
 
     const handleEventClick = (clickInfo: EventClickArg) => {
         if (selectedCalendar) {
@@ -62,7 +86,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         }
     };
 
-    if (!selectedCalendar) {
+    if (!selectedCalendar && sharedCalendars?.length === 0) {
         return (
             <div className="empty-state">
                 <p className="empty-state-title">새로운 캘린더를 만들어보세요!</p>
@@ -113,8 +137,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     dayCellClassNames="min-h-[100px] p-2"
                     eventDisplay="block"
                     eventContent={(eventInfo) => (
+                        // ✅ 공유된 일정이면 초록색, 내 일정이면 파란색
                         <div
-                            className="truncate font-bold text-sm cursor-pointer text-white hover:bg-blue-400 p-1 rounded">
+                            className={`truncate font-bold text-sm cursor-pointer p-1 rounded
+                                ${eventInfo.event.extendedProps.isShared ? "bg-green-500" : "bg-blue-400"}
+                            `}
+                        >
+                            <span className="text-xs">{eventInfo.event.extendedProps.calendarName}</span> {/* 📌 캘린더 이름 표시 */}
+                            <br />
                             {eventInfo.event.title}
                         </div>
                     )}
@@ -138,7 +168,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     }}
                 />
             </div>
-
         </div>
     );
 };
