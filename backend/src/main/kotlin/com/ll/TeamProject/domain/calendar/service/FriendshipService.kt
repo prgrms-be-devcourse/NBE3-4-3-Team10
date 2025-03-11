@@ -14,32 +14,48 @@ class FriendshipService(
     private val friendshipRepository: FriendshipRepository,
     private val userRepository: UserRepository
 ) {
-    fun addFriend(userId1: Long, userId2: Long): Friendship {
-        val user1 = userRepository.findById(userId1).orElseThrow { IllegalArgumentException(" 친구를 찾을 수 없습니다! ") }
-        val user2 = userRepository.findById(userId2).orElseThrow { IllegalArgumentException(" 친구를 찾을 수 없습니다! ") }
-
-        if (friendshipRepository.existsByUser1AndUser2(user1, user2)) {
-            throw ServiceException("400","이미 등록된 친구입니다!")
+    fun addFriend(userId1: Long, userId2: Long): Boolean {
+        val user1 = userRepository.findById(userId1).orElseThrow {
+            ServiceException("404", "친구 $userId1 를 찾을 수 없습니다!")
+        }
+        val user2 = userRepository.findById(userId2).orElseThrow {
+            ServiceException("404", "친구 $userId2 를 찾을 수 없습니다!")
         }
 
-        val friendship = Friendship.create(user1, user2)
-        return friendshipRepository.save(friendship)
+        val user1Id = user1.id ?: throw ServiceException("400", "친구의 ID가 존재하지 않습니다!")
+        val user2Id = user2.id ?: throw ServiceException("400", "친구의 ID가 존재하지 않습니다!")
+
+        val (firstUser, secondUser) = if (user1Id < user2Id) user1 to user2 else user2 to user1
+
+        if (friendshipRepository.existsByUser1AndUser2(firstUser, secondUser)) {
+            return false // 이미 친구 상태
+        }
+
+        val friendship = Friendship.create(firstUser, secondUser)
+        friendshipRepository.save(friendship)
+        return true // 친구 추가 성공
     }
 
     fun getFriends(userId: Long): List<SiteUser> {
-        val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException(" 친구를 찾을 수 없습니다! ") }
+        val user = userRepository.findById(userId).orElseThrow {
+            ServiceException("404", "친구를 찾을 수 없습니다!")
+        }
         return friendshipRepository.findAllByUser(user)
-            .map { if (it.user1 == user) it.user2 else it.user1 }
+            .map { friendship -> if (friendship.user1 == user) friendship.user2 else friendship.user1 }
     }
 
-    fun removeFriend(userId1: Long, userId2: Long) {
-        val user1 = userRepository.findById(userId1).orElseThrow { IllegalArgumentException(" 친구를 찾을 수 없습니다! ") }
-        val user2 = userRepository.findById(userId2).orElseThrow { IllegalArgumentException(" 친구를 찾을 수 없습니다! ") }
+    fun removeFriend(userId1: Long, userId2: Long): Boolean {
+        val user1 = userRepository.findById(userId1).orElseThrow {
+            ServiceException("404", "친구를 찾을 수 없습니다!")
+        }
+        val user2 = userRepository.findById(userId2).orElseThrow {
+            ServiceException("404", "친구를 찾을 수 없습니다!")
+        }
 
-        val friendship = friendshipRepository.findByUser1OrUser2(user1, user2)
-            .find { (it.user1 == user1 && it.user2 == user2) || (it.user1 == user2 && it.user2 == user1) }
-            ?: throw IllegalStateException("친구를 찾을 수 없습니다!")
+        val friendship = friendshipRepository.findByUser1AndUser2OrUser2AndUser1(user1, user2, user2, user1)
+            ?: return false // 친구 관계 없음
 
         friendshipRepository.delete(friendship)
+        return true
     }
 }
