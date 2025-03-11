@@ -11,7 +11,7 @@ import jakarta.persistence.*
 class Calendar(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    var user: SiteUser, // 사용자
+    var user: SiteUser, // 캘린더 소유자
 
     var name: String, // 캘린더 이름
 
@@ -33,19 +33,24 @@ class Calendar(
     @JsonIgnore
     val schedules: MutableList<Schedule> = mutableListOf()
 
-    // 캘린더 정보 업데이트 (record 적용)
+    // 캘린더 정보 업데이트
     fun update(updateDto: CalendarUpdateDto) {
         this.name = updateDto.name
         this.description = updateDto.description
     }
 
-    // 캘린더 이름 및 설명 변경
-    fun update(name: String, description: String) {
-        this.name = name
-        this.description = description
+    // 특정 사용자에게 캘린더 공유
+    fun addSharedUser(user: SiteUser) {
+        if (sharedUsers.none { it.user == user }) {
+            sharedUsers.add(SharedCalendar(this, user))
+        }
+    }
+
+    // 특정 사용자와의 공유 해제
+    fun removeSharedUser(user: SiteUser) {
+        sharedUsers.removeIf { it.user == user }
     }
 
     // 기본 생성자
     constructor() : this(SiteUser(), "Default Name", "")
-
 }
