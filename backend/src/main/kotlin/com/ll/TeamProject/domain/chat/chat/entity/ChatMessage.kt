@@ -18,6 +18,9 @@ data class ChatMessage(
     @JoinColumn(name = "calendar_id", nullable = false)
     val calendar: Calendar,
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id", nullable = false)
+    val chatRoom: ChatRoom,
 
     @Column(length = 1000)
     val message: String,

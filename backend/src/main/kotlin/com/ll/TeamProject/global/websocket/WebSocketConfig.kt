@@ -12,12 +12,11 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @Configuration
 @EnableWebSocket
 class WebSocketConfig(
-    private val chatHandler: ChatHandler,  // 메시지 처리 핸들러
-    private val wsTokenService: WsTokenService // wsToken 검증 서비스
+    private val chatHandler: ChatHandler,
+    private val wsTokenService: WsTokenService
 ) : WebSocketConfigurer {
 
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
-
         registry.addHandler(authenticatedChatHandler(), "/api/calendars/{calendarId}/chat")
             .setAllowedOrigins("*")
 
@@ -26,7 +25,9 @@ class WebSocketConfig(
     }
 
     @Bean
-    fun authenticatedChatHandler(): AuthenticatedChatHandler {
-        return AuthenticatedChatHandler(wsTokenService)
+    fun authenticatedChatHandler() = AuthenticatedChatHandler(wsTokenService).apply {
+        setNextHandler(chatHandler)
     }
 }
+
+

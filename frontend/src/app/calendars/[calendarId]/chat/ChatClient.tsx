@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useWebSocket } from "@/hooks/useWebSocket";
 
 interface ChatClientProps {
@@ -9,8 +9,22 @@ interface ChatClientProps {
 }
 
 const ChatClient = ({ calendarId, userId }: ChatClientProps) => {
-    const { messages, sendMessage } = useWebSocket(calendarId, userId);
+    const { messages, sendMessage, setMessages } = useWebSocket(calendarId, userId);
     const [newMessage, setNewMessage] = useState("");
+
+    const backendHost = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
+    useEffect(() => {
+        fetch(`${backendHost}/api/calendars/${calendarId}/messages`, {
+            credentials: "include",
+        })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                return res.json();
+            })
+            .then(data => setMessages(data))
+            .catch(console.error);
+    }, [calendarId, setMessages, backendHost]);
 
     const handleSend = () => {
         if (newMessage.trim()) {

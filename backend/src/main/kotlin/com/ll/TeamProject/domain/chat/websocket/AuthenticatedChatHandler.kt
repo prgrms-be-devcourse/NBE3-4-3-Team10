@@ -5,23 +5,24 @@ import com.ll.TeamProject.domain.user.entity.SiteUser
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import org.springframework.web.socket.CloseStatus
+import org.springframework.web.socket.TextMessage
 
 class AuthenticatedChatHandler(
     private val wsTokenService: WsTokenService
 ) : TextWebSocketHandler() {
 
+    private var nextHandler: ChatHandler? = null
+
+    fun setNextHandler(handler: ChatHandler) {
+        this.nextHandler = handler
+    }
+
     override fun afterConnectionEstablished(session: WebSocketSession) {
         val wsToken = extractWsToken(session)
         println("🕵️‍♂️ [WebSocket 인증] 받은 wsToken: $wsToken")
 
-        if (wsToken == null) {
+        if (wsToken == null || !wsTokenService.isValidWsToken(wsToken)) {
             println("❌ [WebSocket 인증 실패] wsToken이 없습니다.")
-            session.close(CloseStatus.NOT_ACCEPTABLE)
-            return
-        }
-
-        if (!wsTokenService.isValidWsToken(wsToken)) {
-            println("❌ [WebSocket 인증 실패] 유효하지 않은 wsToken: $wsToken")
             session.close(CloseStatus.NOT_ACCEPTABLE)
             return
         }
@@ -34,33 +35,22 @@ class AuthenticatedChatHandler(
         }
 
         session.attributes["user"] = user
-        println("✅ [WebSocket 인증 성공] username=${user.username}, sessionId=${session.id}")
+        nextHandler?.afterConnectionEstablished(session)
+    }
+
+    override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
+        nextHandler?.handleTextMessage(session, message)
     }
 
     override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {
-        val wsToken = extractWsToken(session)
-        if (wsToken != null) {
-            wsTokenService.removeWsToken(wsToken)
-        }
-        println("🔌 [WebSocket 연결 종료] sessionId=${session.id}, reason=${status.reason}")
+        nextHandler?.afterConnectionClosed(session, status)
+        wsTokenService.removeWsToken(extractWsToken(session) ?: "")
     }
 
-    /**
-     * WebSocket 세션에서 wsToken을 추출 (URI 파라미터 또는 쿠키)
-     */
     private fun extractWsToken(session: WebSocketSession): String? {
-        val uriQuery = session.uri?.query
-        if (!uriQuery.isNullOrEmpty()) {
-            val queryParams = uriQuery.split("&").associate {
-                val (key, value) = it.split("=")
-                key to value
-            }
-            return queryParams["wsToken"]
-        }
-
-        val cookies = session.handshakeHeaders["cookie"] ?: return null
-        return cookies.flatMap { it.split(";") }
-            .map { it.trim().split("=", limit = 2) }
+        val uriQuery = session.uri?.query ?: return null
+        return uriQuery.split("&")
+            .map { it.split("=") }
             .firstOrNull { it.first() == "wsToken" }
             ?.getOrNull(1)
     }

@@ -1,6 +1,9 @@
 package com.ll.TeamProject.global.app
 
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 class AppConfig {
@@ -12,16 +15,16 @@ class AppConfig {
         }
     }
 
-//    // CORS 설정 예제 (필요 시 활성화)
-//    @Bean
-//    fun corsConfigurer(): WebMvcConfigurer {
-//        return object : WebMvcConfigurer {
-//            override fun addCorsMappings(registry: CorsRegistry) {
-//                registry.addMapping("/**")
-//                    .allowedOrigins(getSiteFrontUrl()) // 기존 설정 활용
-//                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-//                    .allowCredentials(true)
-//            }
-//        }
-//    }
+    // CORS 설정 예제 (필요 시 활성화)
+    @Bean
+    fun corsConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**")
+                    .allowedOrigins(getSiteFrontUrl()) // 기존 설정 활용
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowCredentials(true)
+            }
+        }
+    }
 }

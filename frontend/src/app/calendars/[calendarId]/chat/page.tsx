@@ -7,7 +7,7 @@ interface ChatPageProps {
 }
 
 export default async function ChatPage({ params }: ChatPageProps) {
-    const calendarId = params.calendarId; // 명시적 선언
+    const calendarId = String(params.calendarId);
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("accessToken")?.value;
 
@@ -24,4 +24,3 @@ export default async function ChatPage({ params }: ChatPageProps) {
 
     return <ChatClient calendarId={calendarId} userId={userId} />;
 }
-

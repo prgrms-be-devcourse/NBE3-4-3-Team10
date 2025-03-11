@@ -6,5 +6,5 @@ data class ChatMessageDto(
     val senderId: Long,
     val calendarId: Long,
     val message: String = "",
-    val sentAt:LocalDateTime = LocalDateTime.now()
+    val sentAt:LocalDateTime
 )

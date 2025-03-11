@@ -14,7 +14,6 @@ export const useWebSocket = (calendarId: string, userId: number) => {
     const wsRef = useRef<WebSocket | null>(null);
     const backendHost = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
-    // 1️⃣ wsToken 받아오기
     useEffect(() => {
         if (!calendarId || !userId) return;
 
@@ -31,9 +30,8 @@ export const useWebSocket = (calendarId: string, userId: number) => {
         fetchWsToken();
     }, [calendarId, userId]);
 
-    // 2️⃣ WebSocket 연결
     useEffect(() => {
-        if (!calendarId || !wsToken || wsRef.current) return;
+        if (!calendarId || !wsToken) return;
 
         const wsUrl = `${backendHost.replace("http", "ws")}/api/calendars/${calendarId}/chat?wsToken=${wsToken}`;
         const ws = new WebSocket(wsUrl);
@@ -48,8 +46,8 @@ export const useWebSocket = (calendarId: string, userId: number) => {
             setMessages((prev) => [...prev, data]);
         };
 
-        ws.onclose = (event) => {
-            console.log("🔌 WebSocket 연결 종료", event.reason);
+        ws.onclose = () => {
+            console.log("🔌 WebSocket 연결 종료됨");
             wsRef.current = null;
         };
 
@@ -63,7 +61,6 @@ export const useWebSocket = (calendarId: string, userId: number) => {
         };
     }, [wsToken, calendarId]);
 
-    // 3️⃣ 메시지 전송 함수
     const sendMessage = (content: string) => {
         if (!calendarId || !userId || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
             alert("📛 WebSocket 연결이 안 되어 있습니다.");
@@ -77,9 +74,9 @@ export const useWebSocket = (calendarId: string, userId: number) => {
             sentAt: new Date().toISOString()
         };
 
-        setMessages((prev) => [...prev, message]); // 즉시 화면에 반영
+        setMessages((prev) => [...prev, message]);
         wsRef.current.send(JSON.stringify(message));
     };
 
-    return { messages, sendMessage };
+    return { messages, sendMessage, setMessages };
 };

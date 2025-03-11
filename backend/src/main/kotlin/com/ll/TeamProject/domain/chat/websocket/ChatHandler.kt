@@ -7,6 +7,7 @@ import com.ll.TeamProject.domain.chat.chat.service.ChatService
 import com.ll.TeamProject.domain.user.entity.SiteUser
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
@@ -21,7 +22,7 @@ class ChatHandler(
 
     private val log = LoggerFactory.getLogger(ChatHandler::class.java)
 
-    override fun afterConnectionEstablished(session: WebSocketSession) {
+    public override fun afterConnectionEstablished(session: WebSocketSession) {
         val calendarId = extractCalendarId(session)
         if (calendarId == null) {
             log.error("❌ [WebSocket 연결 실패] 캘린더 ID를 URL에서 추출할 수 없습니다.")
@@ -40,18 +41,16 @@ class ChatHandler(
         log.info("✅ [WebSocket 연결 성공] calendarId=$calendarId, username=${user.username}")
     }
 
-    override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
+    public override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
+        log.info("📬 받은 메시지 payload=${message.payload}")
+
         try {
             val chatMessageDto = objectMapper.readValue(message.payload, ChatMessageDto::class.java)
-
             val sender = chatSessionManager.getUser(session)
-            if (sender == null || sender.id == null || sender.id != chatMessageDto.senderId) {
-                log.error("❌ [메시지 처리 실패] 세션 사용자와 senderId 불일치 또는 세션에 사용자 없음.")
-                return
-            }
+                ?: throw IllegalStateException("세션에 사용자가 없습니다.")
 
             val calendar = calendarRepository.findById(chatMessageDto.calendarId)
-                .orElseThrow { IllegalArgumentException("캘린더가 존재하지 않습니다: ${chatMessageDto.calendarId}") }
+                .orElseThrow { IllegalArgumentException("해당 캘린더 없음: ${chatMessageDto.calendarId}") }
 
             val savedMessage = chatService.saveMessage(
                 sender = sender,
@@ -73,13 +72,11 @@ class ChatHandler(
             log.info("📩 [메시지 전송 완료] calendarId=${calendar.id}, sender=${sender.username}, message=${savedMessage.message}")
 
         } catch (e: Exception) {
-            log.error("📛 [메시지 처리 중 오류 발생] ${e.message}")
+            log.error("📛 [메시지 처리 오류] ${e.message}")
         }
     }
 
-
-
-    override fun afterConnectionClosed(session: WebSocketSession, status: org.springframework.web.socket.CloseStatus) {
+    public override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {
         val calendarId = extractCalendarId(session)
         if (calendarId != null) {
             chatSessionManager.removeSession(calendarId, session)
@@ -93,3 +90,4 @@ class ChatHandler(
         return regex.find(uri ?: return null)?.groupValues?.get(1)?.toLongOrNull()
     }
 }
+
