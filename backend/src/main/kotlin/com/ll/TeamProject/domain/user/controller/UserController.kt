@@ -44,4 +44,14 @@ class UserController(
         userService.modify(reqbody.nickname)
         return ResponseEntity.ok(ResponseDto.success("사용자 정보가 수정되었습니다."))
     }
+
+    @GetMapping("/findByUsername")
+    @Operation(summary = "사용자 이름으로 사용자 조회")
+    fun findByUsername(@RequestParam username: String): ResponseEntity<UserDto> {
+        println("📌 요청된 username: $username")
+        val user = userService.findByUsername(username)
+            .orElseThrow { CustomException(UserErrorCode.USER_NOT_FOUND) }
+        println("📌 찾은 사용자: ${user.username}")
+        return ResponseEntity.ok(UserDto(user))
+    }
 }

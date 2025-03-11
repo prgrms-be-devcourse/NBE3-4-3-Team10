@@ -29,10 +29,19 @@ class FriendshipController(
     }
 
     @DeleteMapping("/remove")
-    fun removeFriend(@RequestParam userId1: Long, @RequestParam userId2: Long): ResponseEntity<String> {
+    fun removeFriend(
+        @RequestParam("userId1") userId1Str: String,
+        @RequestParam("userId2") userId2Str: String
+    ): ResponseEntity<Void> {
+        println("✅ 친구 삭제 요청: userId1=$userId1Str, userId2=$userId2Str")
+
+        val userId1 = userId1Str.toLongOrNull() ?: throw IllegalArgumentException("잘못된 userId1 타입!")
+        val userId2 = userId2Str.toLongOrNull() ?: throw IllegalArgumentException("잘못된 userId2 타입!")
+
         friendshipService.removeFriend(userId1, userId2)
-        return ResponseEntity.ok(" 친구가 삭제됬어요! ")
+        return ResponseEntity.noContent().build()
     }
+
     /**
      * 📌 친구가 공유한 캘린더 목록 조회 API
      */

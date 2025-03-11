@@ -21,16 +21,23 @@ class FriendshipService(
      * 친구 추가
      */
     fun addFriend(userId1: Long, userId2: Long): Friendship {
-        val user1 = userRepository.findById(userId1).orElseThrow { IllegalArgumentException(" 친구를 찾을 수 없습니다! ") }
-        val user2 = userRepository.findById(userId2).orElseThrow { IllegalArgumentException(" 친구를 찾을 수 없습니다! ") }
-
-        if (friendshipRepository.existsByUser1AndUser2(user1, user2)) {
-            throw ServiceException("400","이미 등록된 친구입니다!")
+        if (userId1 == userId2) {
+            throw IllegalArgumentException("❌ 본인은 친구 추가할 수 없습니다!")
         }
 
-        val friendship = Friendship.create(user1, user2)
-        return friendshipRepository.save(friendship)
+        val user1 = userRepository.findById(userId1)
+            .orElseThrow { IllegalArgumentException("❌ 친구를 찾을 수 없습니다! (userId1: $userId1)") }
+        val user2 = userRepository.findById(userId2)
+            .orElseThrow { IllegalArgumentException("❌ 친구를 찾을 수 없습니다! (userId2: $userId2)") }
+
+        if (friendshipRepository.existsByUser1AndUser2(user1, user2)) {
+            throw IllegalStateException("❌ 이미 친구로 추가된 사용자입니다!")
+        }
+
+        val friendship = Friendship(user1 = user1, user2 = user2)
+        return friendshipRepository.save(friendship) // ✅ 리턴 타입이 Friendship이므로 명시 가능
     }
+
 
     /**
      * 친구 목록 조회
@@ -45,15 +52,21 @@ class FriendshipService(
      * 친구 삭제
      */
     fun removeFriend(userId1: Long, userId2: Long) {
-        val user1 = userRepository.findById(userId1).orElseThrow { IllegalArgumentException(" 친구를 찾을 수 없습니다! ") }
-        val user2 = userRepository.findById(userId2).orElseThrow { IllegalArgumentException(" 친구를 찾을 수 없습니다! ") }
+        val user1 = userRepository.findById(userId1)
+            .orElseThrow { IllegalArgumentException("❌ 친구를 찾을 수 없습니다! (userId1: $userId1)") }
+        val user2 = userRepository.findById(userId2)
+            .orElseThrow { IllegalArgumentException("❌ 친구를 찾을 수 없습니다! (userId2: $userId2)") }
 
-        val friendship = friendshipRepository.findByUser1OrUser2(user1, user2)
-            .find { (it.user1 == user1 && it.user2 == user2) || (it.user1 == user2 && it.user2 == user1) }
-            ?: throw IllegalStateException("친구를 찾을 수 없습니다!")
+        println("✅ 찾은 친구 정보: ${user1.username} <-> ${user2.username}")
+
+        // ✅ 친구 관계 양방향 조회
+        val friendship = friendshipRepository.findFriendshipBetweenUsers(user1, user2)
+            ?: throw IllegalStateException("친구 관계가 존재하지 않습니다!")
 
         friendshipRepository.delete(friendship)
+        println("✅ 친구 삭제 완료: userId1=$userId1, userId2=$userId2")
     }
+
 
     /**
      * 사용자가 공유받은 캘린더 목록 조회

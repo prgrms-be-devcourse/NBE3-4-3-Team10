@@ -16,12 +16,12 @@ interface CalendarViewProps {
     sharedCalendars: Calendar[]; // ✅ 공유된 캘린더 목록 추가
 }
 
-export const CalendarView: React.FC<CalendarViewProps> = ({ selectedCalendar, sharedCalendars }) => {
+export const CalendarView: React.FC<CalendarViewProps> = ({ selectedCalendar, sharedCalendars = [] }) => {
     const [events, setEvents] = useState<any[]>([]);
     const router = useRouter();
 
     useEffect(() => {
-        if (!selectedCalendar && sharedCalendars.length === 0) return;
+        if (!selectedCalendar && sharedCalendars?.length === 0) return;
 
         const fetchSchedules = async () => {
             try {
@@ -86,7 +86,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ selectedCalendar, sh
         }
     };
 
-    if (!selectedCalendar && sharedCalendars.length === 0) {
+    if (!selectedCalendar && sharedCalendars?.length === 0) {
         return (
             <div className="empty-state">
                 <p className="empty-state-title">새로운 캘린더를 만들어보세요!</p>
