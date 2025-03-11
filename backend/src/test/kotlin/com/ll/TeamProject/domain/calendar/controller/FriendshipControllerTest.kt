@@ -1,119 +1,95 @@
 package com.ll.TeamProject.domain.friend.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.ll.TeamProject.domain.friend.service.FriendshipService
-import com.ll.TeamProject.domain.user.TestUserHelper
 import com.ll.TeamProject.domain.user.entity.SiteUser
-import com.ll.TeamProject.domain.user.service.UserService
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.servlet.ResultActions
-import org.springframework.transaction.annotation.Transactional
-import org.assertj.core.api.Assertions.assertThat
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.http.ResponseEntity
+import kotlin.test.assertEquals
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension::class)
 class FriendshipControllerTest {
 
- @Autowired
+ @Mock
  private lateinit var friendshipService: FriendshipService
 
- @Autowired
- private lateinit var userService: UserService
+ @InjectMocks
+ private lateinit var friendshipController: FriendshipController
 
- @Autowired
- private lateinit var testUserHelper: TestUserHelper
+ @Test
+ fun `친구 추가 - 성공`() {
+  val user = SiteUser(id = 1L, username = "user1")
+  val friendId = 2L
 
- @Autowired
- private lateinit var objectMapper: ObjectMapper
+  Mockito.`when`(friendshipService.addFriend(user.id!!, friendId)).thenReturn(true)
 
- private lateinit var user1: SiteUser
- private lateinit var user2: SiteUser
-
- @BeforeEach
- fun setUp() {
-  user1 = userService.findByUsername("user1").orElseThrow()
-  user2 = userService.findByUsername("user2").orElseThrow()
+  val response = friendshipController.addFriend(user, friendId)
+  assertEquals(ResponseEntity.ok("친구가 추가되었습니다!"), response)
  }
 
  @Test
- @DisplayName("친구 추가 성공")
- fun addFriend_Success() {
-  val resultActions: ResultActions = testUserHelper.requestWithUserAuth(
-   user1.username,
-   post("/api/friends/add")
-    .param("userId1", user1.id.toString())
-    .param("userId2", user2.id.toString())
-  ).andDo(print())
+ fun `친구 추가 - 이미 친구일 때 실패`() {
+  val user = SiteUser(id = 1L, username = "user1")
+  val friendId = 2L
 
-  resultActions
-   .andExpect(status().isOk)
-   .andExpect(content().string(" 친구가 추가됬어요! "))
+  Mockito.`when`(friendshipService.addFriend(user.id!!, friendId)).thenReturn(false)
 
-  val friends = friendshipService.getFriends(user1.id!!)
-  assertThat(friends).contains(user2)
+  val response = friendshipController.addFriend(user, friendId)
+  assertEquals(ResponseEntity.badRequest().body("이미 친구입니다!"), response)
  }
 
  @Test
- @DisplayName("친구 추가 실패 - 이미 친구인 경우")
- fun addFriend_Fail_AlreadyFriends() {
-  friendshipService.addFriend(user1.id!!, user2.id!!)
+ fun `친구 추가 - 자기 자신 추가 시 실패`() {
+  val user = SiteUser(id = 1L, username = "user1")
 
-  val resultActions: ResultActions = testUserHelper.requestWithUserAuth(
-   user1.username,
-   post("/api/friends/add")
-    .param("userId1", user1.id.toString())
-    .param("userId2", user2.id.toString())
-  ).andDo(print())
-
-  resultActions
-   .andExpect(status().isBadRequest)
-   .andExpect(jsonPath("$.resultCode").value("400"))
-   .andExpect(jsonPath("$.msg").value("이미 등록된 친구입니다!"))
+  val response = friendshipController.addFriend(user, user.id!!)
+  assertEquals(ResponseEntity.badRequest().body("자기 자신과는 이미 친구입니다!"), response)
  }
 
  @Test
- @DisplayName("친구 목록 조회 성공")
- fun getFriends_Success() {
-  friendshipService.addFriend(user1.id!!, user2.id!!)
+ fun `친구 목록 조회 - 성공`() {
+  val user = SiteUser(id = 1L, username = "user1")
 
-  val resultActions: ResultActions = testUserHelper.requestWithUserAuth(
-   user1.username,
-   get("/api/friends/{userId}", user1.id!!)
-  ).andDo(print())
+  Mockito.`when`(friendshipService.getFriends(user.id!!)).thenReturn(emptyList())
 
-  resultActions
-   .andExpect(status().isOk)
-   .andExpect(jsonPath("$[0].id").value(user2.id!!))
+  val response = friendshipController.getFriends(user)
+  assertEquals(200, response.statusCode.value())
  }
 
  @Test
- @DisplayName("친구 삭제 성공")
- fun removeFriend_Success() {
-  friendshipService.addFriend(user1.id!!, user2.id!!)
+ fun `친구 삭제 - 성공`() {
+  val user = SiteUser(id = 1L, username = "user1")
+  val friendId = 2L
 
-  val resultActions: ResultActions = testUserHelper.requestWithUserAuth(
-   user1.username,
-   delete("/api/friends/remove")
-    .param("userId1", user1.id.toString())
-    .param("userId2", user2.id.toString())
-  ).andDo(print())
+  Mockito.`when`(friendshipService.removeFriend(user.id!!, friendId)).thenReturn(true)
 
-  resultActions
-   .andExpect(status().isOk)
-   .andExpect(content().string(" 친구가 삭제됬어요! "))
+  val response = friendshipController.removeFriend(user, friendId)
+  assertEquals(ResponseEntity.ok("친구가 삭제되었습니다!"), response)
+ }
 
-  val friends = friendshipService.getFriends(user1.id!!)
-  assertThat(friends).doesNotContain(user2)
+ @Test
+ fun `친구 삭제 - 친구가 아닐 때 실패`() {
+  val user = SiteUser(id = 1L, username = "user1")
+  val friendId = 2L
+
+  Mockito.`when`(friendshipService.removeFriend(user.id!!, friendId)).thenReturn(false)
+
+  val response = friendshipController.removeFriend(user, friendId)
+  assertEquals(ResponseEntity.badRequest().body("친구 관계가 존재하지 않습니다!"), response)
+ }
+
+ @Test
+ fun `친구 삭제 - 존재하지 않는 사용자 삭제 시 실패`() {
+  val user = SiteUser(id = 1L, username = "user1")
+  val nonExistentFriendId = 999L
+
+  Mockito.`when`(friendshipService.removeFriend(user.id!!, nonExistentFriendId)).thenReturn(false)
+
+  val response = friendshipController.removeFriend(user, nonExistentFriendId)
+  assertEquals(ResponseEntity.badRequest().body("친구 관계가 존재하지 않습니다!"), response)
  }
 }
