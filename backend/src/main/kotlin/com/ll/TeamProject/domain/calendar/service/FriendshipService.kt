@@ -79,11 +79,11 @@ class FriendshipService(
     /**
      * 특정 친구에게 캘린더 공유
      */
-    fun shareCalendar(friendId: Long, calendarId: Long) {
+    fun shareCalendar(friendId: Long, calendarId: Long, ownerId: Long) {
         val friend = userRepository.findById(friendId).orElseThrow { IllegalArgumentException("친구를 찾을 수 없습니다!") }
         val calendar = calendarRepository.findById(calendarId).orElseThrow { IllegalArgumentException("캘린더를 찾을 수 없습니다!") }
 
-        calendar.addSharedUser(friend)
+        calendar.addSharedUser(friend, owner)
         calendarRepository.save(calendar)
     }
 

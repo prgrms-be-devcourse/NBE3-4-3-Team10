@@ -18,7 +18,7 @@ class Calendar(
     var description: String // 캘린더 설명
 ) : BaseTime() {
 
-    // 공유된 사용자 목록
+    // ✅ 공유된 사용자 목록 (캘린더 소유자 포함)
     @OneToMany(mappedBy = "calendar", cascade = [CascadeType.ALL], orphanRemoval = true)
     @JsonIgnore
     val sharedUsers: MutableList<SharedCalendar> = mutableListOf()
@@ -33,20 +33,20 @@ class Calendar(
     @JsonIgnore
     val schedules: MutableList<Schedule> = mutableListOf()
 
-    // 캘린더 정보 업데이트
+    // ✅ 캘린더 정보 업데이트
     fun update(updateDto: CalendarUpdateDto) {
         this.name = updateDto.name
         this.description = updateDto.description
     }
 
-    // 특정 사용자에게 캘린더 공유
-    fun addSharedUser(user: SiteUser) {
+    // ✅ 특정 사용자에게 캘린더 공유 (소유자 정보 포함)
+    fun addSharedUser(user: SiteUser, owner: SiteUser) {
         if (sharedUsers.none { it.user == user }) {
-            sharedUsers.add(SharedCalendar(this, user))
+            sharedUsers.add(SharedCalendar(this, user, owner)) // ✅ owner 명시적으로 전달
         }
     }
 
-    // 특정 사용자와의 공유 해제
+    // ✅ 특정 사용자와의 공유 해제
     fun removeSharedUser(user: SiteUser) {
         sharedUsers.removeIf { it.user == user }
     }

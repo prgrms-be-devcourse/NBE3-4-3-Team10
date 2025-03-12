@@ -10,11 +10,13 @@ import lombok.Getter
 class SharedCalendar(
     @field:ManyToOne(fetch = FetchType.LAZY)
     @field:JoinColumn(name = "calendar_id", nullable = false)
-    var calendar: Calendar, // 캘린더 ID
+    var calendar: Calendar, // ✅ 공유된 캘린더
 
     @field:ManyToOne(fetch = FetchType.LAZY)
     @field:JoinColumn(name = "user_id", nullable = false)
-    var user: SiteUser // 공유받은 사용자 ID
-) : BaseEntity() {
-    // BaseEntity는 id를 포함하고 있습니다.
-}
+    var user: SiteUser, // ✅ 공유받는 사용자
+
+    @field:ManyToOne(fetch = FetchType.LAZY)
+    @field:JoinColumn(name = "owner_id", nullable = false) // ✅ 추가: 공유한 사용자(캘린더 소유자)
+    var owner: SiteUser // ✅ 공유한 사용자 (캘린더 소유자)
+) : BaseEntity()

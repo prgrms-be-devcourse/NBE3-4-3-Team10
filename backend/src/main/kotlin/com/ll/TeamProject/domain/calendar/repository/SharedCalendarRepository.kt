@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository
 interface SharedCalendarRepository : JpaRepository<SharedCalendar, Long> {
     fun findByUserId(userId: Long): List<SharedCalendar>
     fun findByUserAndCalendar(user: SiteUser, calendar: Calendar): SharedCalendar?
+    fun findByOwnerId(ownerId: Long): List<SharedCalendar>
 }

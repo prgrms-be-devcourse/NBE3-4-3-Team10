@@ -68,18 +68,23 @@ class CalendarController(
     @GetMapping("/shared/{userId}")
     fun getSharedCalendars(@PathVariable userId: Long): ResponseEntity<List<CalendarResponseDto>> {
         val sharedCalendars = calendarService.getSharedCalendars(userId)
-        val response = sharedCalendars.map { CalendarResponseDto.from(it) }
-        return ResponseEntity.ok(response)
+        return ResponseEntity.ok(sharedCalendars)
     }
+
 
     /**
      * ✅ 특정 친구에게 캘린더 공유
      */
     @PostMapping("/{calendarId}/share/{friendId}")
-    fun shareCalendar(@PathVariable calendarId: Long, @PathVariable friendId: Long): ResponseEntity<String> {
-        calendarService.shareCalendar(friendId, calendarId)
+    fun shareCalendar(
+        @PathVariable calendarId: Long,
+        @PathVariable friendId: Long,
+        @RequestParam ownerId: Long // ✅ 소유자 ID 추가
+    ): ResponseEntity<String> {
+        calendarService.shareCalendar(ownerId, friendId, calendarId) // ✅ ownerId 추가
         return ResponseEntity.ok("캘린더 공유 성공!")
     }
+
 
     /**
      * ✅ 특정 친구와의 캘린더 공유 해제
