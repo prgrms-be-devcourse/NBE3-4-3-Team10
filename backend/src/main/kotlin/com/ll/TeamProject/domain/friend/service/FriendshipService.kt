@@ -72,6 +72,18 @@ class FriendshipService(
         friendshipRepository.save(friendship)
     }
 
+    // ✅ 친구 요청 취소 기능
+    fun cancelFriendRequest(userId: Long, requestId: Long) {
+        val user = userRepository.findById(userId)
+            .orElseThrow { IllegalArgumentException("사용자를 찾을 수 없습니다.") }
+
+        val friendship = friendshipRepository.findById(requestId)
+            .orElseThrow { IllegalArgumentException("친구 요청을 찾을 수 없습니다!") }
+
+        friendship.cancelRequest(user)
+        friendshipRepository.save(friendship)
+    }
+
     /**
      * ✅ 친구 목록 조회 (FriendResponseDto 반환)
      */

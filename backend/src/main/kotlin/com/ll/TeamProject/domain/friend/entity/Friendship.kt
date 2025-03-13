@@ -56,4 +56,15 @@ data class Friendship(
             throw IllegalStateException("이미 처리된 요청입니다!")
         }
     }
+
+    // ✅ 친구 요청 취소 기능
+    fun cancelRequest(requestingUser: SiteUser) {
+        if (status != FriendshipStatus.PENDING) {
+            throw IllegalStateException("이미 처리된 요청은 취소할 수 없습니다!")
+        }
+        if (user1 != requestingUser) {
+            throw IllegalArgumentException("요청을 보낸 사람만 취소할 수 있습니다!")
+        }
+        status = FriendshipStatus.CANCELLED
+    }
 }

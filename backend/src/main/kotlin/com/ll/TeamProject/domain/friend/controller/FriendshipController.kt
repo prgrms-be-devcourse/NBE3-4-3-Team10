@@ -57,6 +57,18 @@ class FriendshipController(
     }
 
     /**
+     * ✅ 친구 요청 취소 API
+     */
+    @DeleteMapping("/cancel")
+    fun cancelFriendRequest(
+        @RequestParam userId: Long,
+        @RequestParam requestId: Long
+    ): ResponseEntity<String> {
+        friendshipService.cancelFriendRequest(userId, requestId)
+        return ResponseEntity.ok("친구 요청이 취소되었습니다!")
+    }
+
+    /**
      * ✅ 친구 목록 조회
      */
     @GetMapping("/{userId}")
