@@ -69,7 +69,7 @@ class FriendshipController(
     }
 
     /**
-     * ✅ 친구 목록 조회
+     * ✅ 친구 목록 조회 API (ACCEPTED 상태만 반환)
      */
     @GetMapping("/{userId}")
     fun getFriends(@PathVariable userId: Long): ResponseEntity<List<FriendResponseDto>> {

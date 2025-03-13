@@ -1,7 +1,7 @@
 package com.ll.TeamProject.domain.friend.repository
 
-import com.ll.TeamProject.domain.friend.entity.FriendshipStatus
 import com.ll.TeamProject.domain.friend.entity.Friendship
+import com.ll.TeamProject.domain.friend.entity.FriendshipStatus
 import com.ll.TeamProject.domain.user.entity.SiteUser
 import io.lettuce.core.dynamic.annotation.Param
 import org.springframework.data.jpa.repository.JpaRepository
@@ -21,8 +21,9 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
         @Param("user2") user2: SiteUser
     ): Friendship?
 
-    @Query("SELECT f FROM Friendship f WHERE (f.user1 = :user OR f.user2 = :user)")
-    fun findAllByUser(user: SiteUser): List<Friendship>
+    // ✅ 특정 사용자의 친구 목록 조회 (ACCEPTED 상태만 조회)
+    @Query("SELECT f FROM Friendship f WHERE (f.user1 = :user OR f.user2 = :user) AND f.status = 'ACCEPTED'")
+    fun findAcceptedFriendshipsByUser(@Param("user") user: SiteUser): List<Friendship>
 
     fun existsByUser1AndUser2(user1: SiteUser, user2: SiteUser): Boolean
 

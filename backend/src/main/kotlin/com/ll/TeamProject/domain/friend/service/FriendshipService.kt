@@ -85,14 +85,13 @@ class FriendshipService(
     }
 
     /**
-     * ✅ 친구 목록 조회 (FriendResponseDto 반환)
+     * ✅ 친구 목록 조회 (ACCEPTED 상태만)
      */
     fun getFriends(userId: Long): List<FriendResponseDto> {
         val user = userRepository.findById(userId)
             .orElseThrow { IllegalArgumentException("사용자를 찾을 수 없습니다.") }
 
-        return friendshipRepository.findAllByUser(user)
-            .filter { it.status == FriendshipStatus.ACCEPTED } // ✅ ACCEPTED 상태만 필터링
+        return friendshipRepository.findAcceptedFriendshipsByUser(user)
             .map { friendship -> FriendResponseDto.from(friendship, user.id!!) }
     }
 
