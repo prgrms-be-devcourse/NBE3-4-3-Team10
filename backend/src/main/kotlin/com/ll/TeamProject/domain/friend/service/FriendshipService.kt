@@ -1,10 +1,10 @@
 package com.ll.TeamProject.domain.friend.service
 
+import com.ll.TeamProject.domain.friend.dto.FriendRequestDto
 import com.ll.TeamProject.domain.friend.dto.FriendResponseDto
 import com.ll.TeamProject.domain.friend.entity.Friendship
 import com.ll.TeamProject.domain.friend.entity.FriendshipStatus
 import com.ll.TeamProject.domain.friend.repository.FriendshipRepository
-import com.ll.TeamProject.domain.user.entity.SiteUser
 import com.ll.TeamProject.domain.user.repository.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
@@ -34,12 +34,12 @@ class FriendshipService(
     /**
      * ✅ 친구 요청 목록 조회 (PENDING 상태)
      */
-    fun getPendingRequests(userId: Long): List<FriendResponseDto> {
+    fun getPendingRequests(userId: Long): List<FriendRequestDto> {
         val user = userRepository.findById(userId)
             .orElseThrow { IllegalArgumentException("사용자를 찾을 수 없습니다.") }
 
         return friendshipRepository.findByUser2AndStatus(user, FriendshipStatus.PENDING)
-            .map { FriendResponseDto.from(it, userId) }
+            .map { FriendRequestDto.from(it) }
     }
 
     /**

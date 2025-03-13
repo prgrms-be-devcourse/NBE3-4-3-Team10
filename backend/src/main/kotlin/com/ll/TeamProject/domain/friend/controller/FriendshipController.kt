@@ -1,5 +1,6 @@
 package com.ll.TeamProject.domain.friend.controller
 
+import com.ll.TeamProject.domain.friend.dto.FriendRequestDto
 import com.ll.TeamProject.domain.friend.dto.FriendResponseDto
 import com.ll.TeamProject.domain.friend.service.FriendshipService
 import org.springframework.http.ResponseEntity
@@ -24,12 +25,12 @@ class FriendshipController(
     }
 
     /**
-     * ✅ 사용자가 받은 친구 요청 목록 조회 (PENDING 상태)
+     * ✅ 친구 요청 목록 조회 API
      */
     @GetMapping("/{userId}/requests")
-    fun getPendingRequests(@PathVariable userId: Long): ResponseEntity<List<FriendResponseDto>> {
-        val requests = friendshipService.getPendingRequests(userId)
-        return ResponseEntity.ok(requests)
+    fun getPendingRequests(@PathVariable userId: Long): ResponseEntity<List<FriendRequestDto>> {
+        val pendingRequests = friendshipService.getPendingRequests(userId)
+        return ResponseEntity.ok(pendingRequests)
     }
 
     /**
