@@ -14,6 +14,8 @@ import java.util.*
 interface UserRepository : JpaRepository<SiteUser, Long> {
     fun findByUsername(username: String): Optional<SiteUser>
 
+    fun findByNickname(nickname: String): SiteUser?
+
     fun findByApiKey(apiKey: String): Optional<SiteUser>
 
     fun findByRoleAndEmailLikeAndIsDeletedFalse(

@@ -16,9 +16,12 @@ class FriendshipController(
 ) {
 
     @PostMapping("/add")
-    fun addFriend(@RequestParam userId1: Long, @RequestParam userId2: Long): ResponseEntity<String> {
-        friendshipService.addFriend(userId1, userId2)
-        return ResponseEntity.ok(" 친구가 추가됬어요! ")
+    fun addFriend(
+        @RequestParam userId: Long,
+        @RequestParam nickname: String // ✅ username → nickname 변경
+    ): ResponseEntity<String> {
+        friendshipService.addFriend(userId, nickname)
+        return ResponseEntity.ok("친구 추가 성공!")
     }
 
     @GetMapping("/{userId}")

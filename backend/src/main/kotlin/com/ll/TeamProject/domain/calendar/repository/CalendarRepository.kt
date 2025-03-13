@@ -5,8 +5,10 @@ import com.ll.TeamProject.domain.user.entity.SiteUser
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Repository
 import java.util.*
 
+@Repository
 interface CalendarRepository : JpaRepository<Calendar, Long> {
 
     // 사용자 ID로 모든 캘린더 조회
