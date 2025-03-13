@@ -34,7 +34,6 @@ export default function ClientPage() {
     if (response.error) {
       alert(response.error.msg);
       if (
-        response.error.resultCode === "403-2" &&
         response.error.msg === "계정이 잠겨있습니다."
       ) {
         window.location.replace("/login/adminVerification"); // 인증번호 페이지로 이동

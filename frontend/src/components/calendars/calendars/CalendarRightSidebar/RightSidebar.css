@@ -44,16 +44,19 @@
     margin: 0;
 }
 
-.friend-item, .chat-item {
+.friend-item {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 8px;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
+    background: #f7f7f7;
+    margin-bottom: 5px;
 }
 
-.friend-item:hover, .chat-item:hover {
+.friend-item:hover {
     background-color: #f1f3f4;
 }
 
@@ -66,9 +69,43 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: bold;
+    color: #3c4043;
 }
 
 .item-name {
     font-size: 14px;
     color: #3c4043;
+    flex-grow: 1;
+}
+
+.friend-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.add-friend-btn {
+    width: 100%;
+    padding: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-friend-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    font-size: 16px;
 }

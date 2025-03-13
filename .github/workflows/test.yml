@@ -1,0 +1,36 @@
+name: Run Tests Before Merging
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: application-secret.yml 생성
+        env:
+          ACTIONS_STEP_DEBUG: true
+          APPLICATION_SECRET: ${{ secrets.APPLICATION_SECRET_YML }}
+        run: echo "$APPLICATION_SECRET" > backend/src/main/resources/application-secret.yml
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x backend/gradlew
+      
+      - name: Build and run tests
+        run: |
+          cd backend
+          ./gradlew build --no-daemon
+          ./gradlew test
