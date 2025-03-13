@@ -21,4 +21,10 @@ data class UserDto(
         modifyDate = user.modifyDate,
         locked = user.locked
     )
+
+    companion object {
+        fun from(user: SiteUser): UserDto {
+            return UserDto(user)
+        }
+    }
 }

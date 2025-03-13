@@ -6,7 +6,6 @@ import com.ll.TeamProject.domain.friend.entity.Friendship
 import com.ll.TeamProject.domain.friend.repository.FriendshipRepository
 import com.ll.TeamProject.domain.user.entity.SiteUser
 import com.ll.TeamProject.domain.user.repository.UserRepository
-import com.ll.TeamProject.global.exceptions.ServiceException
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 

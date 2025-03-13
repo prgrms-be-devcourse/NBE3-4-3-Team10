@@ -1,6 +1,5 @@
 package com.ll.TeamProject.domain.friend.entity
 
-import com.ll.TeamProject.domain.calendar.entity.FriendshipStatus
 import com.ll.TeamProject.domain.friend.repository.FriendshipRepository
 import com.ll.TeamProject.domain.user.entity.SiteUser
 import jakarta.persistence.*

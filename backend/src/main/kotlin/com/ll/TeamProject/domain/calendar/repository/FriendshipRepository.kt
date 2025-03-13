@@ -1,6 +1,6 @@
 package com.ll.TeamProject.domain.friend.repository
 
-import com.ll.TeamProject.domain.calendar.entity.FriendshipStatus
+import com.ll.TeamProject.domain.friend.entity.FriendshipStatus
 import com.ll.TeamProject.domain.friend.entity.Friendship
 import com.ll.TeamProject.domain.user.entity.SiteUser
 import io.lettuce.core.dynamic.annotation.Param
