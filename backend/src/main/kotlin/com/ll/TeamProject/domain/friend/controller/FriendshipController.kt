@@ -25,44 +25,44 @@ class FriendshipController(
     }
 
     /**
-     * ✅ 친구 요청 목록 조회 API
+     * ✅ 친구 요청 목록 조회 (PENDING 상태)
      */
     @GetMapping("/{userId}/requests")
     fun getPendingRequests(@PathVariable userId: Long): ResponseEntity<List<FriendRequestDto>> {
-        val pendingRequests = friendshipService.getPendingRequests(userId)
-        return ResponseEntity.ok(pendingRequests)
+        val requests = friendshipService.getPendingRequests(userId)
+        return ResponseEntity.ok(requests)
     }
 
     /**
      * ✅ 친구 요청 수락
      */
-    @PostMapping("/{userId}/accept/{requestId}")
+    @PostMapping("/{userId}/accept")
     fun acceptFriendRequest(
         @PathVariable userId: Long,
-        @PathVariable requestId: Long
+        @RequestParam requestId: Long
     ): ResponseEntity<String> {
         friendshipService.acceptFriendRequest(userId, requestId)
-        return ResponseEntity.ok("친구 요청이 수락되었습니다!")
+        return ResponseEntity.ok("친구 요청을 수락하였습니다!")
     }
 
     /**
      * ✅ 친구 요청 거절
      */
-    @PostMapping("/{userId}/decline/{requestId}")
+    @PostMapping("/{userId}/decline")
     fun declineFriendRequest(
         @PathVariable userId: Long,
-        @PathVariable requestId: Long
+        @RequestParam requestId: Long
     ): ResponseEntity<String> {
         friendshipService.declineFriendRequest(userId, requestId)
-        return ResponseEntity.ok("친구 요청이 거절되었습니다!")
+        return ResponseEntity.ok("친구 요청을 거절하였습니다!")
     }
 
     /**
-     * ✅ 친구 요청 취소 API
+     * ✅ 친구 요청 취소 (새로 추가됨)
      */
-    @DeleteMapping("/cancel")
+    @DeleteMapping("/{userId}/cancel")
     fun cancelFriendRequest(
-        @RequestParam userId: Long,
+        @PathVariable userId: Long,
         @RequestParam requestId: Long
     ): ResponseEntity<String> {
         friendshipService.cancelFriendRequest(userId, requestId)
@@ -70,23 +70,23 @@ class FriendshipController(
     }
 
     /**
-     * ✅ 친구 목록 조회 API (ACCEPTED 상태만 반환)
+     * ✅ 친구 목록 조회 (ACCEPTED 상태만)
      */
-    @GetMapping("/{userId}")
+    @GetMapping("/{userId}/list")
     fun getFriends(@PathVariable userId: Long): ResponseEntity<List<FriendResponseDto>> {
         val friends = friendshipService.getFriends(userId)
         return ResponseEntity.ok(friends)
     }
 
     /**
-     * ✅ 친구 삭제 (양방향 삭제)
+     * ✅ 친구 삭제
      */
-    @DeleteMapping("/remove")
+    @DeleteMapping("/{userId1}/remove/{userId2}")
     fun removeFriend(
-        @RequestParam userId1: Long,
-        @RequestParam userId2: Long
-    ): ResponseEntity<Void> {
+        @PathVariable userId1: Long,
+        @PathVariable userId2: Long
+    ): ResponseEntity<String> {
         friendshipService.removeFriend(userId1, userId2)
-        return ResponseEntity.noContent().build()
+        return ResponseEntity.ok("친구가 삭제되었습니다!")
     }
 }
