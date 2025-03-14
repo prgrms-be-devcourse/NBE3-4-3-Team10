@@ -11,41 +11,42 @@ import jakarta.persistence.*
 class Calendar(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    var user: SiteUser, // 사용자
+    var user: SiteUser, // 캘린더 소유자
 
     var name: String, // 캘린더 이름
 
     var description: String // 캘린더 설명
 ) : BaseTime() {
 
-    // 공유된 사용자 목록
+    // ✅ 공유된 사용자 목록 (캘린더 소유자 포함)
     @OneToMany(mappedBy = "calendar", cascade = [CascadeType.ALL], orphanRemoval = true)
     @JsonIgnore
     val sharedUsers: MutableList<SharedCalendar> = mutableListOf()
-
-    // 메시지 목록
-    @OneToMany(mappedBy = "calendar", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JsonIgnore
-    val messageList: MutableList<Message> = mutableListOf()
 
     // 일정 목록
     @OneToMany(mappedBy = "calendar", cascade = [CascadeType.REMOVE])
     @JsonIgnore
     val schedules: MutableList<Schedule> = mutableListOf()
 
-    // 캘린더 정보 업데이트 (record 적용)
+    // ✅ 캘린더 정보 업데이트
+    // 캘린더 정보 업데이트
     fun update(updateDto: CalendarUpdateDto) {
         this.name = updateDto.name
         this.description = updateDto.description
     }
 
-    // 캘린더 이름 및 설명 변경
-    fun update(name: String, description: String) {
-        this.name = name
-        this.description = description
+    // ✅ 특정 사용자에게 캘린더 공유 (소유자 정보 포함)
+    fun addSharedUser(user: SiteUser, owner: SiteUser) {
+        if (sharedUsers.none { it.user == user }) {
+            sharedUsers.add(SharedCalendar(this, user, owner)) // ✅ owner 명시적으로 전달
+        }
+    }
+
+    // ✅ 특정 사용자와의 공유 해제
+    fun removeSharedUser(user: SiteUser) {
+        sharedUsers.removeIf { it.user == user }
     }
 
     // 기본 생성자
     constructor() : this(SiteUser(), "Default Name", "")
-
 }
