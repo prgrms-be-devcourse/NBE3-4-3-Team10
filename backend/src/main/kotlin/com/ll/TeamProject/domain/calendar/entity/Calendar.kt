@@ -23,11 +23,6 @@ class Calendar(
     @JsonIgnore
     val sharedUsers: MutableList<SharedCalendar> = mutableListOf()
 
-    // 메시지 목록
-    @OneToMany(mappedBy = "calendar", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JsonIgnore
-    val messageList: MutableList<Message> = mutableListOf()
-
     // 일정 목록
     @OneToMany(mappedBy = "calendar", cascade = [CascadeType.REMOVE])
     @JsonIgnore
