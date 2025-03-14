@@ -17,6 +17,7 @@ interface CalendarSidebarProps {
     onCreateClick: () => void;
     onUpdateClick: () => void;
     onDeleteClick: () => void;
+    onViewClick: () => void;
     selectedCalendar: Calendar | null;
     userId: number;
     onCalendarSelect?: (calendar: Calendar) => void;

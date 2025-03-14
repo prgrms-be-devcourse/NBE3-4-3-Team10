@@ -82,6 +82,8 @@ class CalendarController(
         @RequestParam ownerId: Long // ✅ 소유자 ID 추가
     ): ResponseEntity<String> {
         calendarService.shareCalendar(ownerId, friendId, calendarId) // ✅ ownerId 추가
+    fun shareCalendar(@PathVariable calendarId: Long, @PathVariable friendId: Long): ResponseEntity<String> {
+        calendarService.shareCalendar(friendId, calendarId)
         return ResponseEntity.ok("캘린더 공유 성공!")
     }
 

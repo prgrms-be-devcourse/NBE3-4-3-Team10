@@ -29,6 +29,7 @@ class Calendar(
     val schedules: MutableList<Schedule> = mutableListOf()
 
     // ✅ 캘린더 정보 업데이트
+    // 캘린더 정보 업데이트
     fun update(updateDto: CalendarUpdateDto) {
         this.name = updateDto.name
         this.description = updateDto.description
