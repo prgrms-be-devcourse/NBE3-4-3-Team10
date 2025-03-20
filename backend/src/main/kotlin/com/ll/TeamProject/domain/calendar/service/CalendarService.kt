@@ -20,21 +20,13 @@ import org.springframework.stereotype.Service
 class CalendarService(
     private val calendarRepository: CalendarRepository,
     private val sharedCalendarRepository: SharedCalendarRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val calendarOwnerValidator: CalendarOwnerValidator
 ) {
     private val log: Logger = LoggerFactory.getLogger(CalendarService::class.java)
 
     companion object {
         private const val CALENDAR_NOT_FOUND = "캘린더를 찾을 수 없습니다."
-    }
-
-    /**
-     * ✅ 캘린더 소유자 검증
-     */
-    private fun validateOwner(calendar: Calendar, user: SiteUser) {
-        if (calendar.user.id != user.id) {
-            throw ServiceException("403", "캘린더 소유자만 접근할 수 있습니다.")
-        }
     }
 
     /**
@@ -72,7 +64,7 @@ class CalendarService(
      */
     fun updateCalendar(user: SiteUser, id: Long, dto: CalendarUpdateDto): CalendarResponseDto {
         val calendar = getCalendarById(id)
-        validateOwner(calendar, user)
+        calendarOwnerValidator.validate(calendar, user)
 
         calendar.update(dto)
         log.info("📌 캘린더 수정 완료 - ID: $id, New Name: ${dto.name}, New Description: ${dto.description}")
@@ -85,7 +77,7 @@ class CalendarService(
      */
     fun deleteCalendar(user: SiteUser, id: Long) {
         val calendar = getCalendarById(id)
-        validateOwner(calendar, user)
+        calendarOwnerValidator.validate(calendar, user)
 
         calendarRepository.deleteById(id)
         log.info("📌 캘린더 삭제 완료 - ID: $id")
