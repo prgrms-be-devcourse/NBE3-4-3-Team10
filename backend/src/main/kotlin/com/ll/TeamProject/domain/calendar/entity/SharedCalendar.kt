@@ -1,22 +1,25 @@
 package com.ll.TeamProject.domain.calendar.entity
 
 import com.ll.TeamProject.domain.user.entity.SiteUser
-import com.ll.TeamProject.global.jpa.entity.BaseEntity
+import com.ll.TeamProject.global.jpa.entity.BaseTime
 import jakarta.persistence.*
-import lombok.Getter
 
 @Entity
-@Getter
+@Table(
+    uniqueConstraints = [UniqueConstraint(columnNames = ["calendar_id", "user_id"])] // ✅ 중복 방지
+)
 class SharedCalendar(
-    @field:ManyToOne(fetch = FetchType.LAZY)
-    @field:JoinColumn(name = "calendar_id", nullable = false)
-    var calendar: Calendar, // ✅ 공유된 캘린더
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "calendar_id", nullable = false)
+    var calendar: Calendar,
 
-    @field:ManyToOne(fetch = FetchType.LAZY)
-    @field:JoinColumn(name = "user_id", nullable = false)
-    var user: SiteUser, // ✅ 공유받는 사용자
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    var user: SiteUser,
 
-    @field:ManyToOne(fetch = FetchType.LAZY)
-    @field:JoinColumn(name = "owner_id", nullable = false) // ✅ 추가: 공유한 사용자(캘린더 소유자)
-    var owner: SiteUser // ✅ 공유한 사용자 (캘린더 소유자)
-) : BaseEntity()
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shared_by", nullable = false)
+    var sharedBy: SiteUser
+) : BaseTime()
+
+

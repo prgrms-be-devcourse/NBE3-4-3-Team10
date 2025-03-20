@@ -7,7 +7,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class CalendarOwnerValidator {
-
+    /**
+     * ✅ 캘린더 소유자 검증 메서드
+     */
     fun validate(calendar: Calendar, user: SiteUser) {
         if (calendar.user.id != user.id) {
             throw ServiceException("403", "캘린더 소유자만 접근할 수 있습니다.")
