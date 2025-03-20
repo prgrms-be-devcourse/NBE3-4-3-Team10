@@ -42,9 +42,12 @@ class CalendarController(
      */
     @GetMapping("/{id}")
     fun getCalendarById(
-        @AuthenticationPrincipal user: SiteUser,
+        @AuthenticationPrincipal user: SiteUser?,
         @PathVariable id: Long
     ): ResponseEntity<CalendarResponseDto> {
+        if (user == null) {
+            throw IllegalStateException("사용자가 인증되지 않았습니다.") // 예외 메시지 추가
+        }
         return ResponseEntity.ok(calendarService.getCalendarByIdAsDto(id))
     }
 

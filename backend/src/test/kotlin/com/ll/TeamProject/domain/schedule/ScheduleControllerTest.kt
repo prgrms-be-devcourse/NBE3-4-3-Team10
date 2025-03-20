@@ -110,6 +110,7 @@ class ScheduleControllerTest {
     @BeforeEach
     fun setUpTestData() {
         username = calendarRepository.findUsernameByCalendarId(calendarId)
+            .orElseThrow { IllegalStateException("해당 캘린더에 대한 사용자 이름을 찾을 수 없습니다.") }
         scheduleId1 = createSchedule(meetingScheduleDto)
         scheduleId2 = createSchedule(workoutScheduleDto)
     }
